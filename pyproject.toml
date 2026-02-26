@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "melody-architecture-lab"
+version = "0.1.0"
+description = "Audio-to-Logic Pro arrangement toolkit: transcribe melody, generate harmony, export Logic-ready project kit."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Codex" }]
+keywords = [
+  "logic pro",
+  "audio to midi",
+  "musicxml",
+  "automatic arrangement",
+  "melody harmonization",
+  "macos music production",
+]
+
+[project.scripts]
+melody-architect = "melody_architect.cli:main"
+melody-logic-builder-gui = "melody_architect.gui:main"
+
+[project.optional-dependencies]
+macos-build = ["pyinstaller>=6.0"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["melody_architect*"]
