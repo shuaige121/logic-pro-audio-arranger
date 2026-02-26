@@ -37,6 +37,19 @@ python3 -m melody_architect logic-kit examples/c_major_hook.csv \
   --output-dir ./logic_export
 ```
 
+## How To Convert Audio To Logic Pro Project
+
+```bash
+python3 -m melody_architect logic-kit INPUT.wav \
+  --style pop \
+  --complexity rich \
+  --arrangement-bars 64 \
+  --project-name "My Song" \
+  --output-dir ./logic_export
+```
+
+Then run `open_in_logic.command` in the output folder on macOS.
+
 ## CLI Commands
 
 ### `analyze`

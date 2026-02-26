@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://example.com/melody-architecture-lab/sitemap.xml
+Sitemap: https://shuaige121.github.io/logic-pro-audio-arranger/sitemap.xml
