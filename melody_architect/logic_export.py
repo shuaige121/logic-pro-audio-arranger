@@ -133,7 +133,7 @@ def _resolve_selected_chords(report: dict[str, Any]) -> tuple[Chord, ...]:
 def _write_mac_scripts(bundle_dir: Path, midi_path: Path, project_name: str) -> None:
     open_script = bundle_dir / "open_in_logic.command"
     applescript_path = bundle_dir / "create_logic_project.applescript"
-    final_logicx = bundle_dir / f"{_slugify(project_name)}.logicx"
+    final_logicx = (bundle_dir / f"{_slugify(project_name)}.logicx").resolve()
 
     shell_body = f"""#!/bin/bash
 set -euo pipefail
@@ -146,8 +146,8 @@ if ! command -v osascript >/dev/null 2>&1; then
 fi
 
 echo "Opening Logic Pro and importing MIDI..."
-osascript "$SCRIPT_DIR/{applescript_path.name}" "$MIDI_FILE" "{final_logicx}"
-echo "Done. If Logic prompts for save location, choose: {final_logicx}"
+osascript "$SCRIPT_DIR/{applescript_path.name}" "$MIDI_FILE" "{final_logicx.as_posix()}"
+echo "Done. If Logic prompts for save location, choose: {final_logicx.as_posix()}"
 """
     open_script.write_text(shell_body, encoding="utf-8")
     open_script.chmod(0o755)

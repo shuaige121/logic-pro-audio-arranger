@@ -113,6 +113,7 @@ def generate_harmony_candidates(
     bar_count: int,
     beats_per_bar: int,
     tempo_bpm: float,
+    mode_override: str | None = None,
     include_borrowed_iv: bool = True,
     include_tritone_sub: bool = True,
 ) -> list[HarmonyCandidate]:
@@ -131,7 +132,7 @@ def generate_harmony_candidates(
 
     candidates: list[HarmonyCandidate] = []
     for template in templates:
-        mode = template.mode if template.mode else detected_mode
+        mode = mode_override or template.mode or detected_mode
         romans = _cycle_tokens(template.tokens, bar_count)
         bars = tuple(resolve_roman_to_chord(token, tonic_pc, mode) for token in romans)
         score, coverage, strong_coverage = _score_progression(bars, grouped, beats_per_bar, tempo_bpm)

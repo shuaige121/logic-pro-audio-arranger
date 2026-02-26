@@ -46,6 +46,25 @@ class AnalysisHarmonyTests(unittest.TestCase):
         self.assertEqual(candidates[0].name, "pop_primary")
         self.assertEqual([ch.symbol for ch in candidates[0].bars], ["C", "G", "Am", "F"])
 
+    def test_mode_override_is_applied(self) -> None:
+        notes = [
+            NoteEvent(pitch=57, start=0.0, end=0.5),
+            NoteEvent(pitch=60, start=0.5, end=1.0),
+            NoteEvent(pitch=64, start=1.0, end=1.5),
+            NoteEvent(pitch=65, start=1.5, end=2.0),
+        ]
+        candidates = generate_harmony_candidates(
+            notes=notes,
+            tonic_pc=9,  # A
+            detected_mode="major",
+            style="pop",
+            bar_count=4,
+            beats_per_bar=4,
+            tempo_bpm=120.0,
+            mode_override="minor",
+        )
+        self.assertTrue(all(candidate.mode == "minor" for candidate in candidates))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -7,6 +7,8 @@ from pathlib import Path
 
 from melody_architect.io_midi import load_midi
 from melody_architect.logic_export import create_logic_project_bundle
+from melody_architect.midi_writer import MidiTrack, write_multi_track_midi
+from melody_architect.models import NoteEvent
 from melody_architect.pipeline import analyze_melody_data, load_input_file
 
 
@@ -43,6 +45,26 @@ class LogicExportTests(unittest.TestCase):
             self.assertTrue(any(name and "Lead Melody" in name for name in track_names))
             self.assertTrue(any(name and "Bass" in name for name in track_names))
             self.assertTrue(any(name and "Harmony" in name for name in track_names))
+
+            launcher = (bundle_dir / "open_in_logic.command").read_text(encoding="utf-8")
+            expected_logicx = str((bundle_dir / "unit-test-song.logicx").resolve())
+            self.assertIn(expected_logicx, launcher)
+
+    def test_midi_writer_supports_utf8_track_name(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            midi_path = Path(tmpdir) / "utf8.mid"
+            tracks = [
+                MidiTrack(
+                    name="旋律主线",
+                    channel=0,
+                    program=0,
+                    notes=(NoteEvent(pitch=60, start=0.0, end=0.5, velocity=90),),
+                )
+            ]
+            write_multi_track_midi(midi_path, tracks, tempo_bpm=120.0)
+            parsed = load_midi(midi_path)
+            self.assertEqual(len(parsed.notes), 1)
+            self.assertEqual(parsed.notes[0].track, "旋律主线")
 
 
 if __name__ == "__main__":

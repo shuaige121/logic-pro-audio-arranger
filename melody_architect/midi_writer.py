@@ -36,7 +36,8 @@ def _build_track_bytes(track: MidiTrack, tempo_bpm: float, ticks_per_beat: int) 
     channel = max(0, min(15, track.channel))
     program = max(0, min(127, track.program))
 
-    events.append((0, 0, bytes([0xFF, 0x03, len(track.name)]) + track.name.encode("utf-8", errors="ignore")))
+    name_bytes = track.name.encode("utf-8", errors="ignore")
+    events.append((0, 0, bytes([0xFF, 0x03]) + _varlen(len(name_bytes)) + name_bytes))
     events.append((0, 1, bytes([0xC0 | channel, program])))
 
     for note in track.notes:

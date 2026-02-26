@@ -53,11 +53,12 @@ def analyze_melody_data(
     candidates = generate_harmony_candidates(
         notes=notes,
         tonic_pc=key.tonic_pc,
-        detected_mode=forced_mode or key.mode,
+        detected_mode=key.mode,
         style=style,
         bar_count=bar_count,
         beats_per_bar=data.beats_per_bar,
         tempo_bpm=data.tempo_bpm,
+        mode_override=forced_mode,
         include_borrowed_iv=include_borrowed_iv,
         include_tritone_sub=include_tritone_sub,
     )
