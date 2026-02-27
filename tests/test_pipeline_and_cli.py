@@ -88,6 +88,28 @@ class PipelineAndCliTests(unittest.TestCase):
             self.assertEqual(track_map["complexity"], "rich")
             self.assertEqual(track_map["arrangement_bars"], 24)
 
+    def test_cli_digitize_writes_composition(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            out = Path(tmpdir) / "composition.json"
+            cmd = [
+                "python3",
+                "-m",
+                "melody_architect",
+                "digitize",
+                str(EXAMPLE),
+                "--style",
+                "pop",
+                "--bars",
+                "8",
+                "--out",
+                str(out),
+            ]
+            result = subprocess.run(cmd, cwd=PROJECT_ROOT, text=True, capture_output=True, check=False)
+            self.assertEqual(result.returncode, 0, msg=result.stderr)
+            self.assertTrue(out.exists())
+            payload = json.loads(out.read_text(encoding="utf-8"))
+            self.assertEqual(payload["schema"], "melody_architect.composition")
+
 
 if __name__ == "__main__":
     unittest.main()

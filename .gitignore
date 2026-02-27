@@ -9,4 +9,8 @@ dist/
 *.egg-info/
 .venv*/
 logic_export/
+studio_outputs/
+showcase/
+showcase_rich/
+midi_packs/
 *.log

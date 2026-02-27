@@ -17,10 +17,17 @@ keywords = [
   "melody harmonization",
   "macos music production",
 ]
+dependencies = [
+    "fastapi>=0.133.1",
+    "pydantic>=2.12.5",
+    "python-multipart>=0.0.22",
+    "uvicorn>=0.41.0",
+]
 
 [project.scripts]
 melody-architect = "melody_architect.cli:main"
 melody-logic-builder-gui = "melody_architect.gui:main"
+melody-architect-studio = "melody_architect.webapp:main"
 
 [project.optional-dependencies]
 macos-build = ["pyinstaller>=6.0"]

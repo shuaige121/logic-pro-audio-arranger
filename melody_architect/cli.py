@@ -4,7 +4,9 @@ import argparse
 import json
 from pathlib import Path
 
+from .composition import build_composition_document, save_composition
 from .logic_export import create_logic_project_bundle
+from .midi_pack import generate_midi_pack
 from .pipeline import analyze_file, analyze_melody_data, load_input_file
 from .reporting import to_markdown
 
@@ -50,6 +52,27 @@ def build_parser() -> argparse.ArgumentParser:
     logic_kit.add_argument("--disable-borrowed-iv", action="store_true", help="Disable pop borrowed iv candidate")
     logic_kit.add_argument("--disable-tritone-sub", action="store_true", help="Disable jazz tritone-sub candidate")
     logic_kit.add_argument("--quantize-subdiv", type=int, default=4, help="Quantization subdivisions per beat (default 4)")
+
+    digitize = subparsers.add_parser("digitize", help="Convert input to composition JSON for AI arrangement")
+    digitize.add_argument("input", help="Path to melody input (.wav/.aiff/.mid/.musicxml/.csv)")
+    digitize.add_argument("--style", default="pop", choices=["pop", "modal", "jazz"], help="Analysis style profile")
+    digitize.add_argument("--bars", type=int, default=None, help="Force bar count")
+    digitize.add_argument("--tempo", type=float, default=None, help="Override tempo BPM")
+    digitize.add_argument("--beats-per-bar", type=int, default=4, help="Meter numerator")
+    digitize.add_argument("--mode", default=None, choices=["major", "minor", "dorian", "mixolydian"], help="Mode override")
+    digitize.add_argument("--out", default="composition.json", help="Output composition JSON path")
+
+    midi_pack = subparsers.add_parser("midi-pack", help="Generate multiple MIDI arrangement packs")
+    midi_pack.add_argument("input", help="Path to melody input")
+    midi_pack.add_argument("--output-dir", default="midi_packs", help="Output directory")
+    midi_pack.add_argument("--project-prefix", default="MIDI Pack", help="Project prefix")
+    midi_pack.add_argument("--tempo", type=float, default=None, help="Override tempo BPM")
+    midi_pack.add_argument("--beats-per-bar", type=int, default=4, help="Meter numerator")
+    midi_pack.add_argument("--complexity", default="rich", choices=["basic", "rich"], help="Arrangement complexity")
+
+    studio = subparsers.add_parser("studio", help="Run local frontend + API studio")
+    studio.add_argument("--host", default="127.0.0.1", help="Host")
+    studio.add_argument("--port", type=int, default=8765, help="Port")
     return parser
 
 
@@ -122,6 +145,48 @@ def main(argv: list[str] | None = None) -> int:
                 passed=report["validation"]["passed"],
             )
         )
+        return 0
+
+    if args.command == "digitize":
+        data = load_input_file(args.input, tempo_override=args.tempo, beats_per_bar=args.beats_per_bar)
+        report = analyze_melody_data(
+            data=data,
+            style=args.style,
+            bars=args.bars,
+            forced_mode=args.mode,
+            top_k=5,
+        )
+        composition = build_composition_document(data, report)
+        out = Path(args.out)
+        save_composition(out, composition)
+        print(f"[ok] Composition JSON: {out}")
+        print(
+            "[summary] key={tonic} {mode}, candidate={candidate}, notes={notes}".format(
+                tonic=report["key_estimate"]["tonic"],
+                mode=report["key_estimate"]["mode"],
+                candidate=report["harmony"]["selected_candidate"]["name"],
+                notes=report["input"]["note_count"],
+            )
+        )
+        return 0
+
+    if args.command == "midi-pack":
+        bundles = generate_midi_pack(
+            input_path=args.input,
+            output_dir=args.output_dir,
+            project_prefix=args.project_prefix,
+            tempo_override=args.tempo,
+            beats_per_bar=args.beats_per_bar,
+            complexity=args.complexity,
+        )
+        print(f"[ok] Generated {len(bundles)} bundles in {args.output_dir}")
+        return 0
+
+    if args.command == "studio":
+        import uvicorn
+
+        print(f"[ok] Studio running on http://{args.host}:{args.port}")
+        uvicorn.run("melody_architect.webapp:app", host=args.host, port=args.port, reload=False)
         return 0
 
     parser.print_help()

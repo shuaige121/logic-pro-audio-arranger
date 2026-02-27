@@ -1,0 +1,87 @@
+body {
+  margin: 0;
+  font-family: "Avenir Next", "Helvetica Neue", sans-serif;
+  background: radial-gradient(circle at 20% 10%, #fff4df 0%, #f4f7ff 45%, #ecf4ea 100%);
+  color: #1f2a37;
+}
+
+.page {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 24px 18px 42px;
+  display: grid;
+  gap: 16px;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(31, 42, 55, 0.1);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 8px 26px rgba(31, 42, 55, 0.08);
+}
+
+h1 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+h2 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+label {
+  display: block;
+  font-size: 13px;
+  margin-top: 8px;
+  margin-bottom: 4px;
+}
+
+input,
+select,
+button {
+  font-size: 14px;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #d0d8e1;
+  border-radius: 8px;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+button {
+  margin-top: 12px;
+  margin-right: 10px;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #1d7fe2, #2068c9);
+  color: #fff;
+  cursor: pointer;
+}
+
+button[disabled] {
+  background: #9eabc0;
+  cursor: not-allowed;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+pre {
+  margin: 0;
+  background: #0f172a;
+  color: #d9e2ef;
+  padding: 12px;
+  border-radius: 10px;
+  overflow: auto;
+  max-height: 360px;
+}

@@ -23,13 +23,14 @@ This project targets real workflows like:
 
 ```bash
 cd /home/leonard/melody-architecture-lab
-python3 -m melody_architect analyze examples/c_major_hook.csv --style pop --out-json out.json --out-md out.md
+uv sync
+uv run python -m melody_architect analyze examples/c_major_hook.csv --style pop --out-json out.json --out-md out.md
 ```
 
 Generate Logic kit directly:
 
 ```bash
-python3 -m melody_architect logic-kit examples/c_major_hook.csv \
+uv run python -m melody_architect logic-kit examples/c_major_hook.csv \
   --style pop \
   --complexity rich \
   --arrangement-bars 32 \
@@ -40,7 +41,7 @@ python3 -m melody_architect logic-kit examples/c_major_hook.csv \
 ## How To Convert Audio To Logic Pro Project
 
 ```bash
-python3 -m melody_architect logic-kit INPUT.wav \
+uv run python -m melody_architect logic-kit INPUT.wav \
   --style pop \
   --complexity rich \
   --arrangement-bars 64 \
@@ -55,7 +56,7 @@ Then run `open_in_logic.command` in the output folder on macOS.
 ### `analyze`
 
 ```bash
-python3 -m melody_architect analyze INPUT --style pop --out-json report.json --out-md report.md
+uv run python -m melody_architect analyze INPUT --style pop --out-json report.json --out-md report.md
 ```
 
 `INPUT` supports `.csv/.mid/.midi/.musicxml/.xml/.wav/.aif/.aiff`.
@@ -63,13 +64,33 @@ python3 -m melody_architect analyze INPUT --style pop --out-json report.json --o
 ### `logic-kit`
 
 ```bash
-python3 -m melody_architect logic-kit INPUT.wav \
+uv run python -m melody_architect logic-kit INPUT.wav \
   --style pop \
   --complexity rich \
   --arrangement-bars 32 \
   --project-name "My Song" \
   --output-dir ./logic_export
 ```
+
+### `digitize` (audio -> composition JSON)
+
+```bash
+uv run python -m melody_architect digitize INPUT.wav --style pop --out composition.json
+```
+
+### `midi-pack` (generate many MIDI bundles)
+
+```bash
+uv run python -m melody_architect midi-pack INPUT.wav --output-dir ./midi_packs --project-prefix "Song Pack"
+```
+
+### `studio` (frontend + API)
+
+```bash
+uv run python -m melody_architect studio --host 127.0.0.1 --port 8765
+```
+
+Then open `http://127.0.0.1:8765`.
 
 Output bundle includes:
 
@@ -133,7 +154,7 @@ Artifacts:
 Launch local GUI:
 
 ```bash
-python3 -m melody_architect.gui
+uv run python -m melody_architect.gui
 ```
 
 ## Testing
@@ -141,7 +162,7 @@ python3 -m melody_architect.gui
 Run full test suite:
 
 ```bash
-python3 -m unittest discover -s tests -p 'test_*.py'
+uv run python -m unittest discover -s tests -p 'test_*.py'
 ```
 
 ## SEO and Launch Assets

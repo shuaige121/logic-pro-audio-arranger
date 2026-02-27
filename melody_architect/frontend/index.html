@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Melody Architect Studio</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <section class="card">
+        <h1>Melody Architect Studio</h1>
+        <p>Upload audio/MIDI, convert to composition JSON, then generate Logic arrangement kits.</p>
+
+        <label>Input file</label>
+        <input id="inputFile" type="file" />
+
+        <div class="grid">
+          <div>
+            <label>Style</label>
+            <select id="style">
+              <option>pop</option>
+              <option>modal</option>
+              <option>jazz</option>
+            </select>
+          </div>
+          <div>
+            <label>Analyze bars</label>
+            <input id="bars" type="number" value="8" min="1" />
+          </div>
+          <div>
+            <label>Tempo override</label>
+            <input id="tempo" type="number" value="" placeholder="auto" />
+          </div>
+          <div>
+            <label>Beats per bar</label>
+            <input id="beats" type="number" value="4" min="1" />
+          </div>
+        </div>
+
+        <button id="digitizeBtn">1) Digitize</button>
+      </section>
+
+      <section class="card">
+        <h2>Arrange</h2>
+        <div class="grid">
+          <div>
+            <label>Project name</label>
+            <input id="projectName" type="text" value="Studio Arrangement" />
+          </div>
+          <div>
+            <label>Complexity</label>
+            <select id="complexity">
+              <option>rich</option>
+              <option>basic</option>
+            </select>
+          </div>
+          <div>
+            <label>Arrangement bars</label>
+            <input id="arrBars" type="number" value="64" min="1" />
+          </div>
+          <div>
+            <label>Loop melody</label>
+            <select id="loopMelody">
+              <option value="true">true</option>
+              <option value="false">false</option>
+            </select>
+          </div>
+        </div>
+
+        <button id="arrangeBtn" disabled>2) Generate Logic Kit</button>
+        <button id="packBtn" disabled>3) Generate MIDI Pack (Pop/Modal/Jazz)</button>
+      </section>
+
+      <section class="card">
+        <h2>Output</h2>
+        <pre id="output"></pre>
+      </section>
+    </main>
+    <script src="./studio.js"></script>
+  </body>
+</html>
