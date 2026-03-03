@@ -1,0 +1,152 @@
+/* ===== Control Bar — 44px Logic Pro transport ===== */
+.control-bar {
+  height: var(--transport-height);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  background: linear-gradient(180deg, #3a3a3a 0%, #2e2e2e 100%);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+  flex-shrink: 0;
+}
+
+/* Transport buttons */
+.control-bar__transport {
+  display: flex;
+  gap: 2px;
+}
+
+.control-bar__btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  background: var(--bg-input);
+  color: var(--text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.control-bar__btn:hover {
+  background: var(--bg-surface);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.control-bar__btn--play {
+  color: var(--text-primary);
+}
+
+.control-bar__btn--play.control-bar__btn--active {
+  color: var(--lp-green);
+}
+
+/* LCD panels */
+.control-bar__lcd {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background: var(--bg-inset);
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  border-radius: 3px;
+  min-width: 0;
+}
+
+.control-bar__position {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  color: #e8c840;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.control-bar__lcd--bpm {
+  gap: 2px;
+}
+
+.control-bar__bpm-icon {
+  font-size: 14px;
+  color: var(--lp-green);
+}
+
+.control-bar__bpm-input {
+  width: 40px;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--lp-green);
+  text-align: center;
+}
+
+.control-bar__bpm-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+/* Info area */
+.control-bar__info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.control-bar__key {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding: 2px 6px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+.control-bar__select {
+  padding: 2px 4px;
+  font-size: 10px;
+  font-family: var(--font-body);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.control-bar__params {
+  display: flex;
+  gap: 4px;
+}
+
+/* Generate button */
+.control-bar__generate {
+  padding: 4px 14px;
+  font-size: 11px;
+}
+
+/* Right section */
+.control-bar__right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+@media (max-width: 900px) {
+  .control-bar {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 6px 8px;
+    gap: 4px;
+  }
+
+  .control-bar__right {
+    margin-left: 0;
+  }
+}

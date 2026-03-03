@@ -12,10 +12,10 @@ interface FileUploadProps {
 }
 
 const SOURCE_TYPE_OPTIONS = [
-  { value: 'vocal', icon: '\u{1F3A4}', label: '清唱 (Vocal)', description: 'acapella, no instruments' },
-  { value: 'piano', icon: '\u{1F3B9}', label: '钢琴 (Piano)', description: 'piano recording' },
-  { value: 'guitar', icon: '\u{1F3B8}', label: '吉他 (Guitar)', description: 'guitar recording' },
-  { value: 'other', icon: '\u{1F3B5}', label: '其他 (Other)', description: 'other instrument' },
+  { value: 'vocal', label: 'Vocal', description: 'Acapella' },
+  { value: 'piano', label: 'Piano', description: 'Piano recording' },
+  { value: 'guitar', label: 'Guitar', description: 'Guitar recording' },
+  { value: 'other', label: 'Other', description: 'Other instrument' },
 ] as const;
 
 export default function FileUpload({
@@ -61,10 +61,6 @@ export default function FileUpload({
     e.target.value = '';
   };
 
-  const handleSourceTypeChange = (type: string) => {
-    onSourceTypeChange?.(type);
-  };
-
   return (
     <div className="file-upload-panel">
       <div
@@ -83,7 +79,6 @@ export default function FileUpload({
           </div>
         ) : (
           <>
-            <div className="file-upload__icon">{isDragOver ? '\u{1F4E5}' : '\u{1F3B5}'}</div>
             <div className="file-upload__title">{isDragOver ? t('upload.dropHere') : t('upload.dragDrop')}</div>
             <div className="file-upload__subtitle">{t('upload.clickBrowse')}</div>
             <div className="file-upload__formats">{t('upload.formats')}</div>
@@ -94,7 +89,7 @@ export default function FileUpload({
       </div>
 
       <div className="file-upload__source-type">
-        <div className="file-upload__source-title">乐器类型</div>
+        <div className="file-upload__source-title">Source Type</div>
         <div className="file-upload__source-options">
           {SOURCE_TYPE_OPTIONS.map((option) => (
             <label
@@ -106,10 +101,9 @@ export default function FileUpload({
                 name="source-type"
                 value={option.value}
                 checked={selectedSourceType === option.value}
-                onChange={() => handleSourceTypeChange(option.value)}
+                onChange={() => onSourceTypeChange?.(option.value)}
                 className="file-upload__source-radio"
               />
-              <span className="file-upload__source-icon">{option.icon}</span>
               <span className="file-upload__source-label">{option.label}</span>
               <span className="file-upload__source-desc">{option.description}</span>
             </label>

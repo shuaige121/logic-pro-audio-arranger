@@ -1,111 +1,114 @@
 :root {
-  /* Brand Colors */
-  --brand-green: #A5D97F;
-  --brand-green-dark: #7CB94F;
-  --brand-pink: #FF7F9F;
-  --brand-yellow: #FFD700;
-  --brand-blue: #ADD8E6;
-  --brand-blue-dark: #4682B4;
-  --brand-black: #000000;
+  /* ── Logic Pro Charcoal Palette ── */
+  --lp-bg:          #232323;
+  --lp-bg-alt:      #2a2a2a;
+  --lp-surface:     #333333;
+  --lp-surface-lt:  #3a3a3a;
+  --lp-border:      rgba(255, 255, 255, 0.1);
+  --lp-text:        #d4d4d4;
+  --lp-text-dim:    #808080;
 
-  /* DAW Colors */
-  --daw-bg: #1a1a2e;
-  --daw-bg-alt: #16213e;
-  --daw-surface: #0f3460;
-  --daw-surface-light: #1a4080;
-  --daw-border: rgba(255, 255, 255, 0.1);
-  --daw-text: #e0e0e0;
-  --daw-text-dim: #8899aa;
+  /* Logic Pro accent colors */
+  --lp-blue:        #4a90d9;
+  --lp-yellow:      #f5c542;
+  --lp-green:       #5ec455;
+  --lp-red:         #e04040;
 
-  /* Track Colors (rotate for different tracks) */
-  --track-color-1: #A5D97F;
-  --track-color-2: #FF7F9F;
-  --track-color-3: #FFD700;
-  --track-color-4: #ADD8E6;
-  --track-color-5: #c49bff;
-  --track-color-6: #ff9b5c;
+  /* Region colors (Logic-style) */
+  --region-instrument: #5ec455;
+  --region-audio:      #4a90d9;
+  --region-drums:      #f5c542;
+  --region-midi:       #c080e0;
+
+  /* Track colors */
+  --track-melody:   var(--region-instrument);
+  --track-bass:     var(--lp-blue);
+  --track-chords:   var(--region-midi);
+  --track-pad:      #e08050;
+  --track-drums:    var(--region-drums);
+  --track-color-1:  var(--region-instrument);
+  --track-color-2:  var(--lp-blue);
+  --track-color-3:  var(--region-drums);
+  --track-color-4:  var(--region-midi);
+  --track-color-5:  #e08050;
+  --track-color-6:  #50c0c0;
 
   /* Sizing */
-  --sidebar-width: 240px;
-  --transport-height: 56px;
+  --sidebar-width:    200px;
+  --transport-height: 44px;
+  --inspector-width:  260px;
   --piano-roll-height: 200px;
 
-  /* Fonts */
-  --font-display: 'Fredoka', 'Comic Neue', sans-serif;
-  --font-body: 'Nunito', 'Noto Sans SC', sans-serif;
+  /* Fonts — system stack, no custom web fonts */
+  --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+  --font-body:    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
+  --font-mono:    'SF Mono', 'JetBrains Mono', 'Cascadia Code', 'Fira Code', monospace;
 
   /* Transitions */
-  --transition-fast: 150ms ease;
-  --transition-normal: 250ms ease;
+  --transition-fast:   100ms ease;
+  --transition-normal: 200ms ease;
 
-  /* Workspace semantic tokens */
-  --bg-primary: var(--daw-bg);
-  --bg-secondary: var(--daw-bg-alt);
-  --bg-surface: var(--daw-surface);
-  --bg-elevated: var(--daw-surface-light);
-  --bg-input: #102b4f;
+  /* Semantic tokens */
+  --bg-primary:   var(--lp-bg);
+  --bg-secondary: var(--lp-bg-alt);
+  --bg-surface:   var(--lp-surface);
+  --bg-elevated:  var(--lp-surface-lt);
+  --bg-input:     #2e2e2e;
+  --bg-inset:     #1a1a1a;
 
-  --accent-primary: var(--brand-blue-dark);
-  --accent-secondary: var(--brand-green-dark);
-  --accent-highlight: var(--brand-yellow);
-  --accent-success: var(--brand-green-dark);
-  --accent-warning: var(--brand-pink);
+  --accent-primary:   var(--lp-blue);
+  --accent-secondary: var(--lp-green);
+  --accent-highlight: var(--lp-yellow);
+  --accent-warning:   var(--lp-red);
+  --accent-success:   var(--lp-green);
 
-  --text-primary: var(--daw-text);
-  --text-secondary: #b9c8d8;
-  --text-muted: var(--daw-text-dim);
+  --text-primary:   var(--lp-text);
+  --text-secondary: #b0b0b0;
+  --text-muted:     var(--lp-text-dim);
   --text-on-accent: #ffffff;
 
-  --border-color: var(--daw-border);
-  --border-focus: var(--brand-blue);
+  --border-color: var(--lp-border);
+  --border-focus: var(--lp-blue);
 
-  /* Welcome semantic tokens */
-  --welcome-bg: linear-gradient(180deg, #e7f2db 0%, #d6e8c7 100%);
-  --welcome-surface: rgba(255, 255, 255, 0.8);
-  --welcome-surface-hover: rgba(255, 255, 255, 0.92);
-  --welcome-border: rgba(124, 185, 79, 0.42);
-  --welcome-text-primary: #24402f;
-  --welcome-text-secondary: #4d6f57;
-  --welcome-text-muted: #6f8f73;
-  --welcome-title: #4f812f;
-
-  /* Status / overlays */
-  --status-error: #b71c1c;
-  --status-error-text: #ff8f8f;
-  --status-error-soft: rgba(255, 107, 107, 0.12);
-  --status-error-border: rgba(255, 107, 107, 0.35);
-  --overlay-backdrop: rgba(0, 0, 0, 0.6);
-  --shadow-modal: 0 20px 60px rgba(0, 0, 0, 0.5);
-  --shadow-drawer: 0 -14px 30px rgba(0, 0, 0, 0.25);
+  /* Status */
+  --status-error:        #b71c1c;
+  --status-error-text:   #ff8f8f;
+  --status-error-soft:   rgba(255, 80, 80, 0.12);
+  --status-error-border: rgba(255, 80, 80, 0.35);
   --color-white: #ffffff;
 
   /* DAW interaction layers */
-  --track-divider: rgba(255, 255, 255, 0.08);
-  --track-hover: rgba(255, 255, 255, 0.05);
-  --track-selected: rgba(173, 216, 230, 0.16);
-  --track-selected-hover: rgba(173, 216, 230, 0.24);
-  --accent-primary-soft: rgba(173, 216, 230, 0.16);
-  --accent-primary-soft-strong: rgba(173, 216, 230, 0.46);
-  --accent-primary-border: rgba(173, 216, 230, 0.36);
-  --accent-success-soft: rgba(165, 217, 127, 0.16);
-  --accent-success-border: rgba(165, 217, 127, 0.36);
-  --accent-success-ring: 0 0 0 1px rgba(165, 217, 127, 0.45);
-  --accent-primary-surface: rgba(173, 216, 230, 0.09);
-  --accent-primary-surface-strong: rgba(173, 216, 230, 0.16);
-  --accent-success-strong: #659d3e;
-  --accent-warning-strong: #e26080;
+  --track-divider:     rgba(255, 255, 255, 0.06);
+  --track-hover:       rgba(255, 255, 255, 0.04);
+  --track-selected:    rgba(74, 144, 217, 0.14);
+  --track-selected-hover: rgba(74, 144, 217, 0.22);
 
-  --grid-line: rgba(255, 255, 255, 0.08);
-  --grid-line-soft: rgba(255, 255, 255, 0.05);
-  --grid-line-strong: rgba(255, 255, 255, 0.18);
-  --piano-black-key: #24354c;
-  --piano-black-cell: #1c3048;
-  --active-note-shadow: 0 0 4px rgba(173, 216, 230, 0.45);
+  --accent-primary-soft:        rgba(74, 144, 217, 0.14);
+  --accent-primary-soft-strong: rgba(74, 144, 217, 0.36);
+  --accent-primary-border:      rgba(74, 144, 217, 0.36);
+  --accent-primary-surface:     rgba(74, 144, 217, 0.08);
+  --accent-primary-surface-strong: rgba(74, 144, 217, 0.16);
+  --accent-success-soft:   rgba(94, 196, 85, 0.12);
+  --accent-success-border: rgba(94, 196, 85, 0.36);
+  --accent-success-ring:   0 0 0 1px rgba(94, 196, 85, 0.45);
+  --accent-success-strong: #4aaa3c;
+  --accent-warning-strong: var(--lp-red);
 
-  /* Legacy aliases still used by existing components */
-  --header-height: var(--transport-height);
-  --controls-height: var(--transport-height);
+  --grid-line:        rgba(255, 255, 255, 0.06);
+  --grid-line-soft:   rgba(255, 255, 255, 0.03);
+  --grid-line-strong: rgba(255, 255, 255, 0.14);
+  --piano-black-key:  #272727;
+  --piano-black-cell: #242424;
+  --active-note-shadow: 0 0 4px rgba(74, 144, 217, 0.45);
+
+  /* Legacy aliases */
+  --header-height:    var(--transport-height);
+  --controls-height:  var(--transport-height);
   --track-list-width: var(--sidebar-width);
-  --font-sans: var(--font-body);
-  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  --font-sans:        var(--font-body);
+
+  /* Shadows */
+  --overlay-backdrop: rgba(0, 0, 0, 0.6);
+  --shadow-modal:  0 12px 40px rgba(0, 0, 0, 0.5);
+  --shadow-drawer: 0 -8px 24px rgba(0, 0, 0, 0.25);
 }

@@ -1,12 +1,12 @@
-/* ===== Logic-style Arrangement View ===== */
+/* ===== Arrangement View — Logic Pro style ===== */
 .arrangement-view {
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  color: #e7ecff;
-  background: linear-gradient(180deg, #16213e 0%, #1a1a2e 100%);
+  color: var(--text-primary);
+  background: var(--lp-bg);
 }
 
 .arrangement-view__timeline {
@@ -33,56 +33,56 @@
 }
 
 .arrangement-view__row--sections {
-  height: 30px;
+  height: 28px;
   position: sticky;
   top: 0;
   z-index: 20;
 }
 
 .arrangement-view__row--ruler {
-  height: 32px;
+  height: 28px;
   position: sticky;
-  top: 30px;
+  top: 28px;
   z-index: 19;
 }
 
 .arrangement-view__row--sections .arrangement-view__meta-cell,
 .arrangement-view__row--sections .arrangement-view__timeline-cell {
-  background: rgba(14, 17, 35, 0.96);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(30, 30, 30, 0.96);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .arrangement-view__row--ruler .arrangement-view__meta-cell,
 .arrangement-view__row--ruler .arrangement-view__timeline-cell {
-  background: rgba(10, 13, 29, 0.97);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(26, 26, 26, 0.97);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .arrangement-view__row--track.arrangement-view__row--even .arrangement-view__timeline-cell--track {
-  background-color: rgba(255, 255, 255, 0.045);
+  background-color: rgba(255, 255, 255, 0.025);
 }
 
 .arrangement-view__row--track.arrangement-view__row--odd .arrangement-view__timeline-cell--track {
-  background-color: rgba(255, 255, 255, 0.022);
+  background-color: rgba(255, 255, 255, 0.012);
 }
 
 .arrangement-view__row--track:hover .arrangement-view__timeline-cell--track,
 .arrangement-view__row--track:hover .arrangement-view__meta-cell--track {
-  background-color: rgba(255, 255, 255, 0.08);
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .arrangement-view__meta-cell {
-  width: 210px;
-  min-width: 210px;
-  max-width: 210px;
-  padding: 0 12px;
+  width: 200px;
+  min-width: 200px;
+  max-width: 200px;
+  padding: 0 10px;
   position: sticky;
   left: 0;
   z-index: 10;
   display: flex;
   align-items: center;
-  gap: 10px;
-  border-right: 1px solid rgba(255, 255, 255, 0.14);
+  gap: 8px;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .arrangement-view__meta-cell--section-title,
@@ -91,11 +91,11 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(226, 234, 255, 0.8);
+  color: var(--text-muted);
 }
 
 .arrangement-view__meta-cell--track {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .arrangement-view__timeline-cell {
@@ -104,21 +104,21 @@
 }
 
 .arrangement-view__timeline-cell--track {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .arrangement-view__section-block {
   position: absolute;
-  top: 4px;
-  bottom: 4px;
-  border-radius: 4px;
-  padding: 0 9px;
+  top: 3px;
+  bottom: 3px;
+  border-radius: 3px;
+  padding: 0 8px;
   display: flex;
   align-items: center;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -126,28 +126,26 @@
 
 .arrangement-view__bar-label {
   position: absolute;
-  top: 3px;
-  font-size: 11px;
+  top: 2px;
+  font-size: 10px;
   font-family: var(--font-mono);
   font-weight: 700;
-  color: #f5f7ff;
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+  color: var(--text-secondary);
 }
 
 .arrangement-view__beat-label {
   position: absolute;
-  bottom: 3px;
-  font-size: 10px;
+  bottom: 2px;
+  font-size: 9px;
   font-family: var(--font-mono);
-  color: rgba(225, 235, 255, 0.64);
+  color: var(--text-muted);
 }
 
 .arrangement-view__track-color {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 2px;
   flex-shrink: 0;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.28);
 }
 
 .arrangement-view__track-info {
@@ -157,17 +155,17 @@
 }
 
 .arrangement-view__track-name {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  color: #f1f4ff;
+  color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .arrangement-view__track-subtitle {
-  font-size: 10px;
-  color: rgba(227, 233, 255, 0.66);
+  font-size: 9px;
+  color: var(--text-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -175,16 +173,15 @@
 
 .arrangement-view__note {
   position: absolute;
-  border-radius: 3px;
-  border: 1px solid rgba(255, 255, 255, 0.24);
-  opacity: 0.9;
-  transition: transform var(--transition-fast), opacity var(--transition-fast), filter var(--transition-fast);
+  border-radius: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  opacity: 0.88;
+  transition: opacity var(--transition-fast);
 }
 
 .arrangement-view__note:hover {
-  transform: translateY(-1px);
   opacity: 1;
-  filter: brightness(1.12);
+  filter: brightness(1.1);
 }
 
 .arrangement-view__playhead {
@@ -192,54 +189,61 @@
   top: 0;
   bottom: 0;
   width: 2px;
-  background: #ff4f4f;
-  box-shadow: 0 0 10px rgba(255, 79, 79, 0.55);
+  background: #ff4040;
+  box-shadow: 0 0 6px rgba(255, 64, 64, 0.5);
   z-index: 8;
   pointer-events: none;
 }
 
 .arrangement-view__zoom {
   flex-shrink: 0;
-  height: 40px;
+  height: 32px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 0 14px;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(9, 11, 25, 0.94);
+  gap: 8px;
+  padding: 0 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-secondary);
 }
 
 .arrangement-view__zoom-label,
 .arrangement-view__zoom-value {
-  font-size: 11px;
-  color: rgba(228, 234, 255, 0.86);
+  font-size: 10px;
+  color: var(--text-muted);
   font-family: var(--font-mono);
 }
 
 .arrangement-view__zoom-slider {
-  width: 220px;
-  accent-color: #a5d97f;
+  width: 180px;
+  accent-color: var(--lp-blue);
   cursor: pointer;
 }
 
+/* Empty state */
 .arrangement-view .empty-state {
-  color: rgba(225, 232, 255, 0.74);
+  margin: auto;
+  text-align: center;
+  padding: 40px 20px;
 }
 
 .arrangement-view .empty-state__title {
-  color: rgba(242, 246, 255, 0.9);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
 }
 
 .arrangement-view .empty-state__description {
-  color: rgba(225, 232, 255, 0.74);
+  font-size: 12px;
+  color: var(--text-muted);
 }
 
 @media (max-width: 900px) {
   .arrangement-view__meta-cell {
-    width: 164px;
-    min-width: 164px;
-    max-width: 164px;
-    padding: 0 8px;
+    width: 140px;
+    min-width: 140px;
+    max-width: 140px;
+    padding: 0 6px;
   }
 
   .arrangement-view__track-subtitle {
@@ -247,6 +251,6 @@
   }
 
   .arrangement-view__zoom-slider {
-    width: 150px;
+    width: 120px;
   }
 }

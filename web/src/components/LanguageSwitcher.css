@@ -1,16 +1,16 @@
 .lang-switcher {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 8px;
-  border-radius: 10px;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 3px;
   border: 1px solid var(--border-color);
-  background: var(--bg-elevated);
+  background: var(--bg-input);
   color: var(--text-secondary);
 }
 
 .lang-switcher__label {
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -18,13 +18,13 @@
 }
 
 .lang-switcher__select {
-  min-width: 86px;
+  min-width: 60px;
   border: none;
   outline: none;
   background: transparent;
   color: var(--text-primary);
   font-family: var(--font-body);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   cursor: pointer;
 }

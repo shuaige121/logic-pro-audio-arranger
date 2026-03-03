@@ -1,139 +1,81 @@
+/* ===================================================================
+   APP SHELL — Logic Pro style DAW layout
+   =================================================================== */
+
 .app-shell {
-  min-height: 100vh;
-  padding: 12px;
-  background:
-    radial-gradient(circle at 15% -5%, rgba(165, 217, 127, 0.2) 0%, transparent 35%),
-    radial-gradient(circle at 88% 6%, rgba(255, 127, 159, 0.18) 0%, transparent 34%),
-    linear-gradient(180deg, #101827 0%, #0b1422 100%);
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--lp-bg);
   color: var(--text-primary);
+  overflow: hidden;
 }
 
-.app-shell__topbar {
+/* ── Error Banner ── */
+.error-banner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.app-shell__topbar-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.app-shell__source {
-  display: inline-flex;
-  align-items: center;
-  padding: 5px 10px;
-  border-radius: 999px;
-  border: 1px solid var(--border-color);
-  background: rgba(70, 130, 180, 0.2);
-  color: var(--text-secondary);
-  font-size: 11px;
-}
-
-.upload-step {
-  max-width: 980px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.upload-step__title {
-  margin: 0;
-  font-size: 34px;
-  font-family: var(--font-display);
-  color: var(--brand-green);
-}
-
-.upload-step__subtitle {
-  margin: 0;
-  font-size: 15px;
-  color: var(--text-secondary);
-}
-
-.upload-step__formats {
-  margin: 0;
+  padding: 6px 14px;
+  background: var(--status-error);
+  color: var(--color-white);
   font-size: 12px;
-  color: var(--text-muted);
+  cursor: pointer;
+  z-index: 100;
+  flex-shrink: 0;
 }
 
-.upload-step__alt {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 10px 14px;
-  border-radius: 12px;
-  border: 1px solid var(--border-color);
-  background: rgba(255, 255, 255, 0.03);
-  color: var(--text-secondary);
+.error-banner__message {
+  flex: 1;
 }
 
-.upload-step__alt-buttons {
-  display: flex;
-  gap: 10px;
+.error-banner__dismiss {
+  background: none;
+  border: none;
+  color: var(--color-white);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0 4px;
+  margin-left: 12px;
+  opacity: 0.8;
 }
 
-.workspace-step {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  height: 100%;
-  min-height: 0;
-}
-
-.workspace-step__toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px;
-  border-radius: 12px;
-  border: 1px solid var(--border-color);
-  background: rgba(22, 33, 62, 0.76);
-}
-
-.workspace-step__toolbar h2 {
-  margin: 0;
-  font-size: 24px;
-  font-family: var(--font-display);
-  color: var(--brand-green);
-}
-
-.workspace-step__toolbar-actions {
-  display: flex;
-  gap: 8px;
+.error-banner__dismiss:hover {
+  opacity: 1;
 }
 
 /* ===================================================================
-   DAW WORKSPACE LAYOUT
+   DAW WORKSPACE (screen: workspace)
    =================================================================== */
 
-.daw-body {
-  display: flex;
+.daw-workspace {
+  display: grid;
+  grid-template-rows: var(--transport-height) 1fr auto;
+  grid-template-columns: var(--sidebar-width) 1fr var(--inspector-width);
+  grid-template-areas:
+    "control  control   control"
+    "tracks   timeline  inspector"
+    "editor   editor    editor";
   flex: 1;
-  min-height: 380px;
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
+  min-height: 0;
   overflow: hidden;
-  background: var(--bg-secondary);
 }
 
-.daw-sidebar {
-  width: var(--sidebar-width);
-  min-width: var(--sidebar-width);
+.daw-workspace__control {
+  grid-area: control;
+}
+
+.daw-workspace__tracks {
+  grid-area: tracks;
   display: flex;
   flex-direction: column;
-  background: var(--bg-secondary);
   border-right: 1px solid var(--border-color);
-  flex-shrink: 0;
   overflow: hidden;
+  background: var(--bg-secondary);
 }
 
-.daw-sidebar .track-list {
+.daw-workspace__tracks .track-list {
   flex: 1;
   min-height: 0;
   width: 100%;
@@ -141,157 +83,59 @@
   border-right: none;
 }
 
-.daw-sidebar__section {
-  border-top: 1px solid var(--border-color);
-  flex-shrink: 0;
-}
-
-.daw-sidebar__section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 6px 12px;
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  color: var(--text-muted);
-  background: var(--bg-elevated);
-  cursor: pointer;
-  transition: background var(--transition-fast);
-  user-select: none;
-}
-
-.daw-sidebar__section-header:hover {
-  background: var(--bg-surface);
-}
-
-.daw-sidebar__toggle-icon {
-  font-size: 9px;
-  color: var(--text-muted);
-}
-
-.daw-sidebar__instruments-body {
-  padding: 8px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.daw-sidebar__footer {
-  padding: 8px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  border-top: 1px solid var(--border-color);
-  background: var(--bg-elevated);
-  flex-shrink: 0;
-}
-
-.daw-sidebar__source {
-  font-size: 10px;
-  color: var(--text-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.daw-sidebar__footer-btns {
-  display: flex;
-  gap: 6px;
-}
-
-.daw-arrange-area {
-  flex: 1;
+.daw-workspace__timeline {
+  grid-area: timeline;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   min-width: 0;
 }
 
-.daw-arrange-area__cta {
+.daw-workspace__timeline-cta {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
+  gap: 10px;
+  padding: 10px 12px;
   background: var(--bg-elevated);
   border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;
 }
 
-.daw-midi-player {
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
+.daw-workspace__inspector {
+  grid-area: inspector;
+  border-left: 1px solid var(--border-color);
+  overflow-y: auto;
   background: var(--bg-secondary);
-  flex-shrink: 0;
+}
+
+.daw-workspace__editor {
+  grid-area: editor;
   display: flex;
   flex-direction: column;
-  transition: height var(--transition-normal);
+  border-top: 1px solid var(--border-color);
+  flex-shrink: 0;
   overflow: hidden;
 }
 
-.daw-midi-player--open {
-  max-height: 420px;
-}
-
-.daw-midi-player--closed {
-  max-height: 34px;
-}
-
-.daw-midi-player__header {
+/* ── Editor collapsible panels ── */
+.daw-editor-panel {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 6px 12px;
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  color: var(--text-muted);
-  background: var(--bg-elevated);
+  flex-direction: column;
+  background: var(--bg-secondary);
+  flex-shrink: 0;
+  overflow: hidden;
   border-bottom: 1px solid var(--border-color);
-  cursor: pointer;
-  user-select: none;
 }
 
-.daw-midi-player__header:hover {
-  background: var(--bg-surface);
+.daw-editor-panel--open {
+  max-height: 380px;
 }
 
-.daw-midi-player__toggle {
-  font-size: 9px;
+.daw-editor-panel--closed {
+  max-height: 30px;
 }
 
-.daw-midi-player .midi-player {
-  flex: 1;
-  min-height: 0;
-  overflow: auto;
-  border: none;
-  border-radius: 0;
-}
-
-.daw-piano-roll {
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  background: var(--bg-secondary);
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  transition: height var(--transition-normal);
-  overflow: hidden;
-}
-
-.daw-piano-roll--open {
-  height: var(--piano-roll-height);
-  min-height: 180px;
-  max-height: 40vh;
-}
-
-.daw-piano-roll--closed {
-  height: 34px;
-}
-
-.daw-piano-roll__header {
+.daw-editor-panel__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -306,44 +150,118 @@
   cursor: pointer;
   user-select: none;
   flex-shrink: 0;
+  height: 30px;
 }
 
-.daw-piano-roll__header:hover {
+.daw-editor-panel__header:hover {
   background: var(--bg-surface);
 }
 
-.daw-piano-roll__toggle {
-  font-size: 9px;
+.daw-editor-panel__toggle {
+  font-size: 8px;
 }
 
-.daw-piano-roll .piano-roll {
+.daw-editor-panel .piano-roll {
   flex: 1;
   min-height: 0;
   overflow: auto;
 }
 
-/* ===== Buttons ===== */
+.daw-editor-panel .midi-player {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  border: none;
+  border-radius: 0;
+}
+
+/* Track sidebar sections */
+.daw-sidebar-section {
+  border-top: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.daw-sidebar-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 10px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  background: var(--bg-elevated);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  user-select: none;
+}
+
+.daw-sidebar-section__header:hover {
+  background: var(--bg-surface);
+}
+
+.daw-sidebar-section__toggle {
+  font-size: 8px;
+  color: var(--text-muted);
+}
+
+.daw-sidebar-section__body {
+  padding: 6px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.daw-sidebar-footer {
+  padding: 6px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-elevated);
+  flex-shrink: 0;
+}
+
+.daw-sidebar-footer__source {
+  font-size: 10px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.daw-sidebar-footer__btns {
+  display: flex;
+  gap: 4px;
+}
+
+/* ===================================================================
+   BUTTONS — compact Logic Pro style
+   =================================================================== */
+
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 6px 14px;
-  font-size: 13px;
+  gap: 4px;
+  padding: 4px 10px;
+  font-size: 11px;
   font-weight: 600;
   font-family: var(--font-body);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 3px;
   background: var(--bg-elevated);
   color: var(--text-primary);
   cursor: pointer;
   transition: all var(--transition-fast);
   user-select: none;
+  white-space: nowrap;
 }
 
 .btn:hover {
   background: var(--bg-surface);
-  border-color: var(--brand-blue-dark);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .btn:active {
@@ -351,25 +269,25 @@
 }
 
 .btn--small {
-  padding: 4px 10px;
-  font-size: 11px;
+  padding: 3px 8px;
+  font-size: 10px;
 }
 
 .btn--large {
-  padding: 10px 24px;
-  font-size: 15px;
+  padding: 6px 18px;
+  font-size: 12px;
   font-weight: 700;
 }
 
 .btn--primary {
-  background: var(--brand-blue-dark);
-  border-color: var(--brand-blue-dark);
+  background: var(--lp-blue);
+  border-color: var(--lp-blue);
   color: var(--text-on-accent);
 }
 
 .btn--primary:hover {
-  background: var(--brand-green-dark);
-  border-color: var(--brand-green-dark);
+  background: #5a9ee5;
+  border-color: #5a9ee5;
 }
 
 .btn--primary:disabled {
@@ -384,142 +302,84 @@
 
 .btn--outline:hover {
   background: var(--bg-elevated);
-  border-color: var(--brand-pink);
+  border-color: var(--lp-blue);
 }
 
 .btn--icon {
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
   padding: 0;
-  font-size: 18px;
-  border-radius: 50%;
+  font-size: 14px;
+  border-radius: 3px;
 }
 
 .btn--demo {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
   border: 1px dashed var(--border-color);
-  color: var(--brand-pink);
+  color: var(--text-secondary);
   background: transparent;
 }
 
 .btn--demo:hover {
   background: var(--bg-surface);
-  border-color: var(--brand-pink);
+  border-color: var(--text-muted);
 }
 
-/* ===== Shared ===== */
+/* ===== Shared Controls ===== */
 .select-control {
-  padding: 6px 10px;
-  font-size: 12px;
+  padding: 3px 6px;
+  font-size: 11px;
   font-family: var(--font-body);
   background: var(--bg-input);
   color: var(--text-primary);
   border: 1px solid var(--border-color);
-  border-radius: 6px;
+  border-radius: 3px;
   cursor: pointer;
   transition: border-color var(--transition-fast);
 }
 
 .select-control:focus {
   outline: none;
-  border-color: var(--brand-blue-dark);
+  border-color: var(--lp-blue);
 }
 
 .param-group {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
 }
 
 .control-label {
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.8px;
   color: var(--text-muted);
 }
 
-/* ===== Error Banner ===== */
-.error-banner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 16px;
-  margin-bottom: 10px;
-  border-radius: 10px;
-  background: var(--status-error);
-  color: var(--color-white);
-  font-size: 13px;
-  cursor: pointer;
-  z-index: 100;
-}
-
-.error-banner__message {
-  flex: 1;
-}
-
-.error-banner__dismiss {
-  background: none;
-  border: none;
-  color: var(--color-white);
-  font-size: 18px;
-  cursor: pointer;
-  padding: 0 4px;
-  margin-left: 12px;
-  opacity: 0.8;
-}
-
-.error-banner__dismiss:hover {
-  opacity: 1;
-}
-
+/* ===== Responsive ===== */
 @media (max-width: 900px) {
-  .app-shell {
-    padding: 8px;
+  .daw-workspace {
+    grid-template-columns: 1fr;
+    grid-template-rows: var(--transport-height) auto 1fr auto auto;
+    grid-template-areas:
+      "control"
+      "tracks"
+      "timeline"
+      "inspector"
+      "editor";
   }
 
-  .upload-step__alt {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .upload-step__alt-buttons {
-    width: 100%;
-  }
-
-  .upload-step__alt-buttons .btn {
-    flex: 1;
-  }
-
-  .workspace-step__toolbar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .workspace-step__toolbar-actions {
-    flex-wrap: wrap;
-  }
-
-  .daw-body {
-    flex-direction: column;
-    min-height: 0;
-  }
-
-  .daw-sidebar {
-    width: 100%;
-    min-width: 0;
-    max-height: 36vh;
+  .daw-workspace__tracks {
     border-right: none;
     border-bottom: 1px solid var(--border-color);
+    max-height: 30vh;
   }
 
-  .daw-sidebar__footer-btns {
-    flex-wrap: wrap;
-  }
-
-  .daw-piano-roll--open {
-    height: min(42vh, 260px);
-    min-height: 160px;
+  .daw-workspace__inspector {
+    border-left: none;
+    border-top: 1px solid var(--border-color);
+    max-height: 30vh;
   }
 }

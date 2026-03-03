@@ -1,17 +1,15 @@
-/* ===== Track List (Left Panel) ===== */
+/* ===== Track List — Logic Pro style ===== */
 .track-list {
   display: flex;
   flex-direction: column;
-  width: var(--sidebar-width);
-  min-width: var(--sidebar-width);
+  width: 100%;
   background: var(--bg-secondary);
-  border-right: 1px solid var(--border-color);
   overflow-y: auto;
   flex-shrink: 0;
 }
 
 .track-list__header {
-  padding: 6px 12px;
+  padding: 5px 10px;
   font-size: 10px;
   font-weight: 600;
   text-transform: uppercase;
@@ -23,8 +21,8 @@
 }
 
 .track-list__empty {
-  padding: 20px 12px;
-  font-size: 12px;
+  padding: 16px 10px;
+  font-size: 11px;
   color: var(--text-muted);
   text-align: center;
 }
@@ -33,12 +31,12 @@
 .track-list__item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 8px 6px 0;
+  gap: 6px;
+  padding: 4px 6px 4px 0;
   border-bottom: 1px solid var(--track-divider);
   cursor: pointer;
   transition: background var(--transition-fast);
-  min-height: 48px;
+  min-height: 40px;
 }
 
 .track-list__item:hover {
@@ -47,7 +45,6 @@
 
 .track-list__item--selected {
   background: var(--track-selected);
-  border-left: none;
 }
 
 .track-list__item--selected:hover {
@@ -92,19 +89,19 @@
 .track-list__controls {
   display: flex;
   align-items: center;
-  gap: 3px;
+  gap: 2px;
   flex-shrink: 0;
 }
 
 .track-list__btn {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   padding: 0;
   font-size: 9px;
   font-weight: 700;
   font-family: var(--font-body);
   border: 1px solid var(--border-color);
-  border-radius: 3px;
+  border-radius: 2px;
   background: var(--bg-elevated);
   color: var(--text-muted);
   cursor: pointer;
@@ -118,22 +115,24 @@
   border-color: var(--text-muted);
 }
 
+/* Mute active = BLUE */
 .track-list__btn--mute.track-list__btn--active {
-  background: var(--status-error);
-  border-color: var(--status-error);
+  background: var(--lp-blue);
+  border-color: var(--lp-blue);
   color: var(--color-white);
 }
 
+/* Solo active = YELLOW */
 .track-list__btn--solo.track-list__btn--active {
-  background: var(--accent-highlight);
-  border-color: var(--accent-highlight);
-  color: var(--color-white);
+  background: var(--lp-yellow);
+  border-color: var(--lp-yellow);
+  color: #1a1a1a;
 }
 
 /* Volume slider */
 .track-list__volume {
-  width: 48px;
-  height: 14px;
+  width: 44px;
+  height: 12px;
   cursor: pointer;
-  accent-color: var(--accent-primary);
+  accent-color: var(--lp-blue);
 }

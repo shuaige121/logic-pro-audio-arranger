@@ -48,7 +48,7 @@ export async function parseMidiFile(file: File): Promise<{ notes: NoteEvent[]; t
 // Backend upload for audio files
 // ---------------------------------------------------------------------------
 
-const BACKEND_URL = 'http://localhost:8765';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8765';
 
 /**
  * Upload a file to the backend for digitization.

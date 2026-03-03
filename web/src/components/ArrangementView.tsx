@@ -33,20 +33,21 @@ interface TrackLaneData {
   subtitle: string;
 }
 
-const TRACK_HEIGHT = 72;
-const TRACK_PADDING_Y = 8;
-const TRACK_META_WIDTH = 210;
+const TRACK_HEIGHT = 64;
+const TRACK_PADDING_Y = 6;
+const TRACK_META_WIDTH = 200;
 
 const DEFAULT_BEAT_WIDTH = 30;
 const MIN_BEAT_WIDTH = 14;
 const MAX_BEAT_WIDTH = 96;
 
-const BRAND_COLORS = ['#A5D97F', '#FF7F9F', '#FFD700', '#ADD8E6'];
+/* Logic Pro region colors: green=instrument, blue=audio, yellow=drums, purple=midi */
+const BRAND_COLORS = ['#5ec455', '#4a90d9', '#f5c542', '#c080e0'];
 const SECTION_FALLBACK_COLORS = [
-  'rgba(165, 217, 127, 0.28)',
-  'rgba(255, 127, 159, 0.26)',
-  'rgba(255, 215, 0, 0.24)',
-  'rgba(173, 216, 230, 0.28)',
+  'rgba(94, 196, 85, 0.24)',
+  'rgba(74, 144, 217, 0.22)',
+  'rgba(245, 197, 66, 0.20)',
+  'rgba(192, 128, 224, 0.22)',
 ];
 const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 

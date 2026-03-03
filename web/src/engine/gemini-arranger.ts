@@ -8,9 +8,11 @@
 import type { NoteEvent, Arrangement, ArrangementTrack, KeyEstimate } from '../types/music.ts';
 import { estimateKey, inferBarCount, generateHarmony, buildArrangement } from './index.ts';
 
-const GEMINI_API_KEY = 'AIzaSyCJRYaoU34Sfq9PlwCPIDeCQDzDPhoYLNw';
+type CreativityLevel = 'conservative' | 'balanced' | 'creative';
+
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
 const GEMINI_MODEL = 'gemini-2.0-flash';
-const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
 // ---------------------------------------------------------------------------
 // JSON Schema for structured output
@@ -59,9 +61,15 @@ function buildPrompt(
   style: string,
   tempoBpm: number,
   bars: number,
+  creativityLevel: CreativityLevel,
 ): string {
   const secondsPerBeat = 60 / tempoBpm;
   const totalDuration = bars * 4 * secondsPerBeat;
+  const creativityGuidance = creativityLevel === 'conservative'
+    ? 'Use simple, stable accompaniment with clear harmonic support and minimal rhythmic syncopation.'
+    : creativityLevel === 'creative'
+      ? 'Use adventurous voicings, rhythmic variation, and tasteful counter-melodies while staying musical.'
+      : 'Balance clear support with occasional rhythmic and harmonic variation.';
 
   // Compact melody representation
   const melodyCompact = melody.slice(0, 200).map(n => ({
@@ -78,6 +86,7 @@ function buildPrompt(
 - Style: ${style}
 - Tempo: ${tempoBpm} BPM
 - Bars: ${bars} (4/4 time)
+- Creativity level: ${creativityLevel}
 - Total duration: ${totalDuration.toFixed(2)} seconds
 - Seconds per beat: ${secondsPerBeat.toFixed(4)}
 
@@ -94,6 +103,9 @@ Style guidelines:
 - Pop: Straight 4/4 feel, root-fifth bass, block chords, standard rock beat
 - Jazz: Walking bass, shell voicings (3rd+7th), swing ride cymbal pattern
 - Modal: Pedal bass tones, open voicings, sparse percussion with groove
+
+Creativity guidance:
+- ${creativityGuidance}
 
 ## Rules
 - All note start times must be >= 0 and < ${totalDuration.toFixed(2)}
@@ -122,7 +134,8 @@ async function callGemini(prompt: string): Promise<{ tracks: ArrangementTrack[] 
     },
   };
 
-  const response = await fetch(GEMINI_ENDPOINT, {
+  const endpoint = `${GEMINI_ENDPOINT}?key=${encodeURIComponent(GEMINI_API_KEY)}`;
+  const response = await fetch(endpoint, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
@@ -187,40 +200,45 @@ export async function generateArrangementWithAI(
   style: 'pop' | 'modal' | 'jazz',
   complexity: 'basic' | 'rich',
   beatsPerBar: number,
+  creativityLevel: CreativityLevel = 'balanced',
 ): Promise<{ arrangement: Arrangement; aiGenerated: boolean; key: KeyEstimate; harmony: import('../types/music.ts').HarmonyCandidate | null }> {
   const key = estimateKey(melody);
   const barCount = Math.max(inferBarCount(melody, tempoBpm, beatsPerBar) || bars, bars);
   const secondsPerBeat = 60 / tempoBpm;
   const totalDuration = barCount * beatsPerBar * secondsPerBeat;
 
-  // Try Gemini first
-  try {
-    const prompt = buildPrompt(melody, key, style, tempoBpm, barCount);
-    const result = await callGemini(prompt);
+  // Try Gemini first when key is available.
+  if (GEMINI_API_KEY) {
+    try {
+      const prompt = buildPrompt(melody, key, style, tempoBpm, barCount, creativityLevel);
+      const result = await callGemini(prompt);
 
-    const aiTracks = validateAndCleanTracks(result.tracks, totalDuration);
-    if (aiTracks.length === 0) throw new Error('AI returned no valid tracks');
+      const aiTracks = validateAndCleanTracks(result.tracks, totalDuration);
+      if (aiTracks.length === 0) throw new Error('AI returned no valid tracks');
 
-    // Always include the original melody as the first track
-    const melodyTrack: ArrangementTrack = {
-      name: 'Lead Melody',
-      instrument: 'Synth Lead',
-      channel: 0,
-      program: 80,
-      notes: melody,
-    };
+      // Always include the original melody as the first track
+      const melodyTrack: ArrangementTrack = {
+        name: 'Lead Melody',
+        instrument: 'Synth Lead',
+        channel: 0,
+        program: 80,
+        notes: melody,
+      };
 
-    const arrangement: Arrangement = {
-      tracks: [melodyTrack, ...aiTracks],
-      tempoBpm,
-      bars: barCount,
-      style,
-      complexity,
-    };
+      const arrangement: Arrangement = {
+        tracks: [melodyTrack, ...aiTracks],
+        tempoBpm,
+        bars: barCount,
+        style,
+        complexity,
+      };
 
-    return { arrangement, aiGenerated: true, key, harmony: null };
-  } catch (err) {
-    console.warn('Gemini arranger failed, falling back to local engine:', err);
+      return { arrangement, aiGenerated: true, key, harmony: null };
+    } catch (err) {
+      console.warn('Gemini arranger failed, falling back to local engine:', err);
+    }
+  } else {
+    console.warn('Gemini API key is missing, skipping Gemini and using local engine fallback.');
   }
 
   // Fallback to local engine

@@ -1,4 +1,4 @@
-/* ===== Piano Roll ===== */
+/* ===== Piano Roll — Logic Pro style ===== */
 .piano-roll {
   display: flex;
   flex-direction: column;
@@ -25,8 +25,8 @@
 }
 
 .piano-roll__key-spacer {
-  width: 52px;
-  min-width: 52px;
+  width: 48px;
+  min-width: 48px;
   flex-shrink: 0;
 }
 
@@ -34,8 +34,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 24px;
-  font-size: 10px;
+  height: 22px;
+  font-size: 9px;
   font-family: var(--font-mono);
   color: var(--text-muted);
   flex-shrink: 0;
@@ -61,14 +61,14 @@
 
 /* Key labels */
 .piano-roll__key {
-  width: 52px;
-  min-width: 52px;
-  height: 20px;
+  width: 48px;
+  min-width: 48px;
+  height: 18px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding-right: 6px;
-  font-size: 10px;
+  padding-right: 5px;
+  font-size: 9px;
   font-family: var(--font-mono);
   color: var(--text-secondary);
   background: var(--bg-secondary);
@@ -84,7 +84,7 @@
 }
 
 .piano-roll__key--c {
-  color: var(--accent-primary);
+  color: var(--lp-blue);
   font-weight: 700;
   border-bottom: 1px solid var(--border-color);
 }
@@ -112,7 +112,7 @@
 }
 
 .piano-roll__cell--active {
-  background: var(--accent-primary) !important;
+  background: var(--lp-blue) !important;
   border-radius: 2px;
   box-shadow: var(--active-note-shadow);
 }
