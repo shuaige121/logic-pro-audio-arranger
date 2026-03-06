@@ -22,6 +22,17 @@ interface AnalysisViewProps {
 const KEY_OPTIONS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 const MODE_OPTIONS: Array<AnalysisFormState['mode']> = ['major', 'minor', 'dorian', 'mixolydian'];
 const TIME_SIGNATURE_OPTIONS: TimeSignature[] = ['3/4', '4/4', '6/8'];
+const VISUALLY_HIDDEN_STYLE = {
+  position: 'absolute',
+  width: 1,
+  height: 1,
+  padding: 0,
+  margin: -1,
+  overflow: 'hidden',
+  clip: 'rect(0, 0, 0, 0)',
+  whiteSpace: 'nowrap',
+  border: 0,
+} as const;
 
 function modeLabel(mode: AnalysisFormState['mode']): string {
   switch (mode) {
@@ -64,33 +75,44 @@ export default function AnalysisView({ value, onChange, onConfirm }: AnalysisVie
       </div>
 
       <div className="analysis-view__controls">
-        <label className="analysis-view__field">
+        <div className="analysis-view__field">
           <span>{t('analyze_key')}</span>
           <div className="analysis-view__key-row">
-            <select
-              className="select-control"
-              value={value.key}
-              onChange={(event) => onChange({ ...value, key: event.target.value })}
-            >
-              {KEY_OPTIONS.map((keyName) => (
-                <option key={keyName} value={keyName}>
-                  {keyName}
-                </option>
-              ))}
-            </select>
-            <select
-              className="select-control"
-              value={value.mode}
-              onChange={(event) => onChange({ ...value, mode: event.target.value as AnalysisFormState['mode'] })}
-            >
-              {MODE_OPTIONS.map((mode) => (
-                <option key={mode} value={mode}>
-                  {modeLabel(mode)}
-                </option>
-              ))}
-            </select>
+            <label>
+              <span style={VISUALLY_HIDDEN_STYLE}>{t('analyze_key')}</span>
+              <select
+                className="select-control"
+                value={value.key}
+                onChange={(event) => onChange({ ...value, key: event.target.value })}
+              >
+                {KEY_OPTIONS.map((keyName) => (
+                  <option key={keyName} value={keyName}>
+                    {keyName}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              <span style={VISUALLY_HIDDEN_STYLE}>Mode</span>
+              <select
+                className="select-control"
+                value={value.mode}
+                onChange={(event) => {
+                  const nextMode = event.target.value;
+                  if (MODE_OPTIONS.includes(nextMode as AnalysisFormState['mode'])) {
+                    onChange({ ...value, mode: nextMode as AnalysisFormState['mode'] });
+                  }
+                }}
+              >
+                {MODE_OPTIONS.map((mode) => (
+                  <option key={mode} value={mode}>
+                    {modeLabel(mode)}
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
-        </label>
+        </div>
 
         <label className="analysis-view__field">
           <span>{t('analyze_bpm')}</span>
@@ -111,7 +133,12 @@ export default function AnalysisView({ value, onChange, onConfirm }: AnalysisVie
           <select
             className="select-control"
             value={value.timeSignature}
-            onChange={(event) => onChange({ ...value, timeSignature: event.target.value as TimeSignature })}
+            onChange={(event) => {
+              const nextSignature = event.target.value;
+              if (TIME_SIGNATURE_OPTIONS.includes(nextSignature as TimeSignature)) {
+                onChange({ ...value, timeSignature: nextSignature as TimeSignature });
+              }
+            }}
           >
             {TIME_SIGNATURE_OPTIONS.map((signature) => (
               <option key={signature} value={signature}>

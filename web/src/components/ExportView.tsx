@@ -35,17 +35,17 @@ export default function ExportView({
       {
         id: 'midi' as const,
         title: t('export_midi'),
-        description: 'Standard DAW workflow and editable notes.',
+        description: t('export_midi_desc'),
       },
       {
         id: 'mp3' as const,
         title: t('export_mp3'),
-        description: 'Quick listening draft for sharing.',
+        description: t('export_mp3_desc'),
       },
       {
         id: 'logic' as const,
         title: t('export_logic'),
-        description: 'Session package optimized for Logic Pro.',
+        description: t('export_logic_desc'),
       },
     ],
     [t],
@@ -61,7 +61,7 @@ export default function ExportView({
     <section className="export-view">
       <header className="export-view__header">
         <h2>{t('export_title')}</h2>
-        <p>{t('success')}: {isReady ? 'Arrangement ready' : 'Generate arrangement first'}</p>
+        <p>{t('success')}: {isReady ? t('export_ready') : t('export_not_ready')}</p>
       </header>
 
       <div className="export-view__cards">
