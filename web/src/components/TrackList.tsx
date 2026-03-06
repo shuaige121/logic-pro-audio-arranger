@@ -80,14 +80,14 @@ export default function TrackList({
               <button
                 className={`track-list__btn track-list__btn--mute ${state.muted ? 'track-list__btn--active' : ''}`}
                 onClick={(e) => { e.stopPropagation(); onMuteToggle(track.name); }}
-                title="Mute"
+                title={t('edit_mute')}
               >
                 M
               </button>
               <button
                 className={`track-list__btn track-list__btn--solo ${state.soloed ? 'track-list__btn--active' : ''}`}
                 onClick={(e) => { e.stopPropagation(); onSoloToggle(track.name); }}
-                title="Solo"
+                title={t('edit_solo')}
               >
                 S
               </button>
@@ -100,7 +100,7 @@ export default function TrackList({
                 value={state.volume}
                 onClick={(e) => e.stopPropagation()}
                 onChange={(e) => onVolumeChange(track.name, parseFloat(e.target.value))}
-                title={`Volume: ${Math.round(state.volume * 100)}%`}
+                title={`${t('edit_volume')}: ${Math.round(state.volume * 100)}%`}
               />
             </div>
           </div>

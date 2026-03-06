@@ -3,9 +3,11 @@ from __future__ import annotations
 
 import csv
 import shutil
-import struct
+import sys
 from dataclasses import dataclass, field
 from pathlib import Path
+
+import pretty_midi
 
 BASE_DIR = Path(__file__).resolve().parent
 INPUT_CSV = Path("examples/c_major_hook.csv")
@@ -62,137 +64,39 @@ class MidiValidationResult:
         )
 
 
-def read_varlen(data: bytes, pos: int, limit: int) -> tuple[int, int]:
-    value = 0
-    while True:
-        if pos >= limit:
-            raise ValueError("Unexpected EOF while reading variable-length quantity")
-        byte = data[pos]
-        pos += 1
-        value = (value << 7) | (byte & 0x7F)
-        if byte & 0x80 == 0:
-            return value, pos
-
-
-def parse_track_events(track_data: bytes, track_index: int) -> tuple[str, int]:
-    pos = 0
-    limit = len(track_data)
-    running_status: int | None = None
-    note_count = 0
-    track_name = ""
-
-    while pos < limit:
-        _, pos = read_varlen(track_data, pos, limit)
-        if pos >= limit:
-            break
-
-        status_or_data = track_data[pos]
-        if status_or_data < 0x80:
-            if running_status is None:
-                raise ValueError("Running status encountered before any status byte")
-            status = running_status
-        else:
-            status = status_or_data
-            running_status = status
-            pos += 1
-
-        if status == 0xFF:
-            if pos >= limit:
-                raise ValueError("Truncated meta event")
-            meta_type = track_data[pos]
-            pos += 1
-            meta_len, pos = read_varlen(track_data, pos, limit)
-            end = pos + meta_len
-            if end > limit:
-                raise ValueError("Meta event length exceeds track bounds")
-            payload = track_data[pos:end]
-            pos = end
-
-            if meta_type == 0x03:
-                decoded = payload.decode("utf-8", errors="replace").strip()
-                if decoded:
-                    track_name = decoded
-            elif meta_type == 0x2F:
-                break
-            continue
-
-        if status in (0xF0, 0xF7):
-            sysex_len, pos = read_varlen(track_data, pos, limit)
-            end = pos + sysex_len
-            if end > limit:
-                raise ValueError("SysEx length exceeds track bounds")
-            pos = end
-            continue
-
-        event_type = status & 0xF0
-
-        if event_type in (0x80, 0x90, 0xA0, 0xB0, 0xE0):
-            if pos + 2 > limit:
-                raise ValueError("Channel message exceeds track bounds")
-            note = track_data[pos]
-            velocity = track_data[pos + 1]
-            if event_type == 0x90 and velocity > 0:
-                _ = note
-                note_count += 1
-            pos += 2
-        elif event_type in (0xC0, 0xD0):
-            if pos + 1 > limit:
-                raise ValueError("Program/channel pressure message exceeds track bounds")
-            pos += 1
-        else:
-            raise ValueError(f"Unsupported MIDI status byte: 0x{status:02X}")
-
-    if not track_name:
-        track_name = f"track_{track_index + 1}"
-    return track_name, note_count
-
-
 def parse_midi_basic(path: Path) -> dict:
-    data = path.read_bytes()
-    if len(data) < 14:
-        raise ValueError("File too small to be a MIDI file")
-    if data[:4] != b"MThd":
-        raise ValueError("Not a MIDI file (missing MThd)")
-
-    header_len = struct.unpack(">I", data[4:8])[0]
-    if header_len < 6:
-        raise ValueError("Invalid MIDI header length")
-    header_end = 8 + header_len
-    if header_end > len(data):
-        raise ValueError("Header exceeds file size")
-
-    midi_format, num_tracks, division = struct.unpack(">HHH", data[8:14])
+    """Parse a MIDI file using pretty-midi and return structured info."""
+    pm = pretty_midi.PrettyMIDI(str(path))
+    file_size = path.stat().st_size
 
     tracks: list[TrackInfo] = []
-    pos = header_end
-    for track_index in range(num_tracks):
-        if pos + 8 > len(data):
-            raise ValueError("Track header truncated")
-        if data[pos : pos + 4] != b"MTrk":
-            raise ValueError(f"Track chunk missing at byte offset {pos}")
-        track_len = struct.unpack(">I", data[pos + 4 : pos + 8])[0]
-        start = pos + 8
-        end = start + track_len
-        if end > len(data):
-            raise ValueError("Track chunk exceeds file size")
-
-        track_data = data[start:end]
-        track_name, note_count = parse_track_events(track_data, track_index)
+    for idx, inst in enumerate(pm.instruments):
         tracks.append(
             TrackInfo(
-                index=track_index + 1,
-                name=track_name,
-                notes=note_count,
-                bytes_len=track_len,
+                index=idx + 1,
+                name=inst.name or f"track_{idx + 1}",
+                notes=len(inst.notes),
+                bytes_len=0,  # not meaningful with pretty-midi, kept for compat
             )
         )
-        pos = end
+
+    # pretty-midi doesn't directly expose format/division, but we can read
+    # the raw header for those fields if needed for the report
+    data = path.read_bytes()
+    midi_format = 1
+    division = 480
+    num_tracks_raw = len(pm.instruments)
+    if len(data) >= 14 and data[:4] == b"MThd":
+        import struct
+        midi_format = struct.unpack(">H", data[8:10])[0]
+        num_tracks_raw = struct.unpack(">H", data[10:12])[0]
+        division = struct.unpack(">H", data[12:14])[0]
 
     return {
         "format": midi_format,
-        "num_tracks": num_tracks,
+        "num_tracks": num_tracks_raw,
         "division": division,
-        "file_size": len(data),
+        "file_size": file_size,
         "tracks": tracks,
     }
 

@@ -6,23 +6,27 @@ import {
   PlaybackEngine,
   parseFile,
   generateArrangementWithAI,
+  SUPPORTED_EXTENSIONS,
   estimateKey,
   detectPhrasesInfo,
   nameToPitchClass,
 } from './engine/index.ts';
 import { useI18n } from './i18n.ts';
-import type { CreativityLevelValue, AnalysisFormState } from './components/Inspector.tsx';
-import type { TrackState } from './components/TrackList.tsx';
-import ProjectChooser from './components/ProjectChooser.tsx';
-import ControlBar from './components/ControlBar.tsx';
-import Inspector from './components/Inspector.tsx';
+import StepWizard from './components/StepWizard.tsx';
+import FileUpload from './components/FileUpload.tsx';
+import AnalysisView from './components/AnalysisView.tsx';
+import type { AnalysisFormState } from './components/AnalysisView.tsx';
+import ArrangeView from './components/ArrangeView.tsx';
 import TrackList from './components/TrackList.tsx';
+import type { TrackState } from './components/TrackList.tsx';
 import ArrangementView from './components/ArrangementView.tsx';
+import InstrumentPicker from './components/InstrumentPicker.tsx';
 import MidiPlayer from './components/MidiPlayer.tsx';
 import PianoRoll from './components/PianoRoll.tsx';
+import ExportView from './components/ExportView.tsx';
+import LanguageSwitcher from './components/LanguageSwitcher.tsx';
+import type { CreativityLevelValue } from './components/CreativityLevel.tsx';
 import './App.css';
-
-type Screen = 'chooser' | 'workspace';
 
 function createDemoNotes(tempoBpm: number): NoteEvent[] {
   const secondsPerBeat = 60 / tempoBpm;
@@ -38,16 +42,13 @@ function createDemoNotes(tempoBpm: number): NoteEvent[] {
 function App() {
   const { t } = useI18n();
 
-  /* ── Screen state ── */
-  const [screen, setScreen] = useState<Screen>('chooser');
+  const [currentStep, setCurrentStep] = useState(1);
   const [sourceFileName, setSourceFileName] = useState<string | null>(null);
 
-  /* ── Upload ── */
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [sourceType, setSourceType] = useState<string>('vocal');
 
-  /* ── Music data ── */
   const [notes, setNotes] = useState<NoteEvent[]>([]);
   const [arrangement, setArrangement] = useState<Arrangement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -59,21 +60,19 @@ function App() {
   const [bars, setBars] = useState(8);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  /* ── Instruments ── */
   const [leadProgram, setLeadProgram] = useState(80);
   const [bassProgram, setBassProgram] = useState(33);
   const [harmonyProgram, setHarmonyProgram] = useState(0);
 
-  /* ── Analysis ── */
   const [keyEstimate, setKeyEstimate] = useState<KeyEstimate | null>(null);
   const [harmony, setHarmony] = useState<HarmonyCandidate | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showInstrumentPanel, setShowInstrumentPanel] = useState(false);
 
-  /* ── Track state ── */
   const [selectedTrack, setSelectedTrack] = useState<string | null>(null);
   const [trackStates, setTrackStates] = useState<Record<string, TrackState>>({});
   const [showPianoRoll, setShowPianoRoll] = useState(true);
-  const [showMidiPlayer, setShowMidiPlayer] = useState(false);
+  const [showMidiPlayer, setShowMidiPlayer] = useState(true);
 
   const [analysisState, setAnalysisState] = useState<AnalysisFormState>({
     key: 'C',
@@ -87,7 +86,6 @@ function App() {
 
   const beatsPerBar = analysisState.timeSignature === '3/4' ? 3 : analysisState.timeSignature === '6/8' ? 6 : 4;
 
-  /* ── Playback refs ── */
   const playbackRef = useRef<PlaybackEngine | null>(null);
   const animFrameRef = useRef<number>(0);
   const loadedArrangementRef = useRef<Arrangement | null>(null);
@@ -97,7 +95,6 @@ function App() {
     return playbackRef.current;
   }, []);
 
-  /* ── Effects ── */
   useEffect(() => {
     if (error) {
       const timer = setTimeout(() => setError(null), 5000);
@@ -152,7 +149,7 @@ function App() {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (screen !== 'workspace') return;
+      if (currentStep < 3) return;
       if (
         event.target instanceof HTMLInputElement ||
         event.target instanceof HTMLSelectElement ||
@@ -168,9 +165,8 @@ function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [screen]);
+  }, [currentStep]);
 
-  /* ── Handlers ── */
   const applyParsedMelody = useCallback((parsedNotes: NoteEvent[], tempoBpm: number, fileName: string | null) => {
     const roundedTempo = Math.max(40, Math.min(240, Math.round(tempoBpm)));
     const phraseCount = parsedNotes.length > 0 ? detectPhrasesInfo(parsedNotes, 60 / roundedTempo).length : 0;
@@ -202,7 +198,7 @@ function App() {
       notes: parsedNotes.length,
       phrases: phraseCount,
     });
-    setScreen('workspace');
+    setCurrentStep(2);
   }, []);
 
   const handleFileSelected = useCallback(async (file: File) => {
@@ -243,8 +239,25 @@ function App() {
       notes: 0,
       phrases: 0,
     });
-    setScreen('workspace');
+    setCurrentStep(4);
   }, [t]);
+
+  const handleAnalysisConfirm = useCallback(() => {
+    try {
+      const tonicPc = nameToPitchClass(analysisState.key);
+      setTempo(analysisState.bpm);
+      setBars(analysisState.bars);
+      setKeyEstimate({
+        tonicPc,
+        tonicName: analysisState.key,
+        mode: analysisState.mode,
+        score: keyEstimate?.score ?? 1,
+      });
+      setCurrentStep(3);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t('error'));
+    }
+  }, [analysisState, keyEstimate, t]);
 
   const handlePlay = useCallback(async () => {
     try {
@@ -284,7 +297,7 @@ function App() {
     setIsGenerating(true);
     setError(null);
     try {
-      const result = await generateArrangementWithAI(notes, tempo, bars, style, complexity, beatsPerBar, creativityLevel);
+      const result = await generateArrangementWithAI(notes, tempo, bars, style, complexity, beatsPerBar);
       const nextArrangement = result.arrangement;
 
       for (const track of nextArrangement.tracks) {
@@ -297,12 +310,13 @@ function App() {
       setKeyEstimate(result.key);
       setHarmony(result.harmony);
       loadedArrangementRef.current = null;
+      setCurrentStep(4);
     } catch (err) {
       setError(err instanceof Error ? err.message : t('error'));
     } finally {
       setIsGenerating(false);
     }
-  }, [notes, tempo, bars, style, complexity, beatsPerBar, creativityLevel, leadProgram, bassProgram, harmonyProgram, t]);
+  }, [notes, tempo, bars, style, complexity, beatsPerBar, leadProgram, bassProgram, harmonyProgram, t]);
 
   const handleTempoChange = useCallback((nextTempo: number) => {
     setTempo(nextTempo);
@@ -357,7 +371,7 @@ function App() {
     anchor.click();
     document.body.removeChild(anchor);
     URL.revokeObjectURL(url);
-  }, [arrangement, keyEstimate, harmony]);
+  }, [arrangement, keyEstimate, harmony, t]);
 
   const handleMuteToggle = useCallback((name: string) => {
     setTrackStates((prev) => {
@@ -385,148 +399,167 @@ function App() {
     playbackRef.current?.setTrackVolume(name, volume);
   }, []);
 
-  const handleAnalysisChange = useCallback((next: AnalysisFormState) => {
-    setAnalysisState(next);
-    // Sync key estimate if key/mode changed
-    try {
-      const tonicPc = nameToPitchClass(next.key);
-      setKeyEstimate((prev) => ({
-        tonicPc,
-        tonicName: next.key,
-        mode: next.mode,
-        score: prev?.score ?? 1,
-      }));
-    } catch {
-      // ignore invalid key names
+  const canGoBack = currentStep > 1;
+  const canGoNext =
+    currentStep === 1 ? notes.length > 0 :
+      currentStep === 2 ? true :
+        currentStep === 3 ? arrangement !== null :
+          currentStep === 4;
+
+  const handleWizardBack = useCallback(() => {
+    setCurrentStep((prev) => Math.max(1, prev - 1));
+  }, []);
+
+  const handleWizardNext = useCallback(() => {
+    if (currentStep === 2) {
+      handleAnalysisConfirm();
+      return;
     }
-    if (next.bpm !== tempo) setTempo(next.bpm);
-    if (next.bars !== bars) setBars(next.bars);
-  }, [tempo, bars]);
+    if (currentStep >= 5) return;
+    setCurrentStep((prev) => Math.min(5, prev + 1));
+  }, [currentStep, handleAnalysisConfirm]);
 
-  /* ── Render ── */
-  if (screen === 'chooser') {
-    return (
-      <div className="app-shell">
-        {error && (
-          <div className="error-banner" onClick={() => setError(null)}>
-            <span className="error-banner__message">{error}</span>
-            <button className="error-banner__dismiss">&times;</button>
-          </div>
-        )}
-        <ProjectChooser
-          onFileSelected={handleFileSelected}
-          isProcessing={isUploading}
-          uploadError={uploadError}
-          sourceType={sourceType}
-          onSourceTypeChange={setSourceType}
-          onLoadDemo={handleLoadDemo}
-          onDrawManually={handleStartManual}
-          tempo={analysisState.bpm}
-          onTempoChange={(v) => setAnalysisState((p) => ({ ...p, bpm: v }))}
-          keyName={analysisState.key}
-          onKeyChange={(v) => setAnalysisState((p) => ({ ...p, key: v }))}
-          timeSignature={analysisState.timeSignature}
-          onTimeSignatureChange={(v) => setAnalysisState((p) => ({ ...p, timeSignature: v as '3/4' | '4/4' | '6/8' }))}
-        />
-      </div>
-    );
-  }
+  const renderCurrentStep = () => {
+    if (currentStep === 1) {
+      return (
+        <section className="upload-step">
+          <h1 className="upload-step__title">{t('upload_title')}</h1>
+          <p className="upload-step__subtitle">{t('upload_subtitle')}</p>
+          <p className="upload-step__formats">{t('upload_formats')}</p>
 
-  // Screen: workspace
-  return (
-    <div className="app-shell">
-      {error && (
-        <div className="error-banner" onClick={() => setError(null)}>
-          <span className="error-banner__message">{error}</span>
-          <button className="error-banner__dismiss">&times;</button>
-        </div>
-      )}
-
-      <div className="daw-workspace">
-        {/* Control Bar */}
-        <div className="daw-workspace__control">
-          <ControlBar
-            isPlaying={isPlaying}
-            currentBeat={currentBeat}
-            beatsPerBar={beatsPerBar}
-            tempo={tempo}
-            bars={bars}
-            style={style}
-            complexity={complexity}
-            keyName={keyEstimate?.tonicName ?? null}
-            modeName={keyEstimate?.mode ?? null}
-            isGenerating={isGenerating}
-            onPlay={() => { void handlePlay(); }}
-            onStop={handleStop}
-            onTempoChange={handleTempoChange}
-            onBarsChange={handleBarsChange}
-            onStyleChange={setStyle}
-            onComplexityChange={setComplexity}
-            onGenerate={() => { void handleGenerate(); }}
-            onBack={() => setScreen('chooser')}
+          <FileUpload
+            onFileSelected={handleFileSelected}
+            isProcessing={isUploading}
+            error={uploadError}
+            supportedFormats={SUPPORTED_EXTENSIONS}
+            sourceType={sourceType}
+            onSourceTypeChange={setSourceType}
           />
-        </div>
 
-        {/* Track Headers */}
-        <div className="daw-workspace__tracks">
-          <TrackList
-            tracks={arrangement?.tracks || []}
-            trackStates={trackStates}
-            selectedTrack={selectedTrack}
-            onTrackSelect={setSelectedTrack}
-            onMuteToggle={handleMuteToggle}
-            onSoloToggle={handleSoloToggle}
-            onVolumeChange={handleVolumeChange}
-          />
-          <div className="daw-sidebar-footer">
-            <span className="daw-sidebar-footer__source">
-              {sourceFileName ? `${t('sidebar.melody')}: ${sourceFileName}` : t('sidebar.melodyInput')}
-            </span>
-            <div className="daw-sidebar-footer__btns">
-              <button className="btn btn--small btn--demo" onClick={handleLoadDemo}>{t('sidebar.demo')}</button>
-              <button className="btn btn--small" onClick={() => setScreen('chooser')}>{t('sidebar.uploadFile')}</button>
+          <div className="upload-step__alt">
+            <span>{t('upload_or')}</span>
+            <div className="upload-step__alt-buttons">
+              <button className="btn btn--outline" onClick={handleLoadDemo}>{t('upload_demo')}</button>
+              <button className="btn btn--outline" onClick={handleStartManual}>{t('upload_draw')}</button>
             </div>
           </div>
-        </div>
+        </section>
+      );
+    }
 
-        {/* Arrangement Timeline */}
-        <div className="daw-workspace__timeline">
-          {!arrangement && notes.length > 0 && (
-            <div className="daw-workspace__timeline-cta">
-              <button className="btn btn--primary" onClick={() => { void handleGenerate(); }} disabled={isGenerating}>
+    if (currentStep === 2) {
+      return (
+        <AnalysisView
+          value={analysisState}
+          onChange={setAnalysisState}
+          onConfirm={handleAnalysisConfirm}
+        />
+      );
+    }
+
+    if (currentStep === 3) {
+      return (
+        <ArrangeView
+          creativityLevel={creativityLevel}
+          onCreativityChange={setCreativityLevel}
+          transport={{
+            isPlaying,
+            tempo,
+            style,
+            complexity,
+            bars,
+            currentBeat,
+            beatsPerBar,
+            onPlay: () => { void handlePlay(); },
+            onStop: handleStop,
+            onTempoChange: handleTempoChange,
+            onStyleChange: setStyle,
+            onComplexityChange: setComplexity,
+            onBarsChange: handleBarsChange,
+            onGenerate: () => { void handleGenerate(); },
+            isGenerating,
+          }}
+        />
+      );
+    }
+
+    if (currentStep === 4) {
+      return (
+        <section className="workspace-step">
+          <div className="workspace-step__toolbar">
+            <h2>{t('edit_title')}</h2>
+            <div className="workspace-step__toolbar-actions">
+              <button className="btn btn--small" onClick={() => { void handlePlay(); }}>
+                {isPlaying ? t('transport.pause') : t('transport.play')}
+              </button>
+              <button className="btn btn--small" onClick={handleStop}>{t('transport.stop')}</button>
+              <button className="btn btn--small btn--primary" onClick={() => { void handleGenerate(); }} disabled={isGenerating}>
                 {isGenerating ? t('arrange_generating') : t('arrange_generate')}
               </button>
             </div>
-          )}
-          <ArrangementView arrangement={arrangement} currentBeat={currentBeat} beatsPerBar={beatsPerBar} />
-        </div>
+          </div>
 
-        {/* Inspector */}
-        <div className="daw-workspace__inspector">
-          <Inspector
-            analysisState={analysisState}
-            onAnalysisChange={handleAnalysisChange}
-            creativityLevel={creativityLevel}
-            onCreativityChange={setCreativityLevel}
-            leadProgram={leadProgram}
-            onLeadChange={setLeadProgram}
-            bassProgram={bassProgram}
-            onBassChange={setBassProgram}
-            harmonyProgram={harmonyProgram}
-            onHarmonyChange={setHarmonyProgram}
-            hasArrangement={Boolean(arrangement)}
-            onExportMidi={handleDownloadMidi}
-            onExportMp3={handleExportMp3}
-            onExportLogic={handleExportLogic}
-          />
-        </div>
+          <div className="daw-body">
+            <div className="daw-sidebar">
+              <TrackList
+                tracks={arrangement?.tracks || []}
+                trackStates={trackStates}
+                selectedTrack={selectedTrack}
+                onTrackSelect={setSelectedTrack}
+                onMuteToggle={handleMuteToggle}
+                onSoloToggle={handleSoloToggle}
+                onVolumeChange={handleVolumeChange}
+              />
 
-        {/* Editor panels */}
-        <div className="daw-workspace__editor">
-          <div className={`daw-editor-panel ${showPianoRoll ? 'daw-editor-panel--open' : 'daw-editor-panel--closed'}`}>
-            <div className="daw-editor-panel__header" onClick={() => setShowPianoRoll((p) => !p)}>
+              <div className="daw-sidebar__section">
+                <div className="daw-sidebar__section-header" onClick={() => setShowInstrumentPanel((prev) => !prev)}>
+                  <span>{t('sidebar.instruments')}</span>
+                  <span className="daw-sidebar__toggle-icon">{showInstrumentPanel ? '\u25B2' : '\u25BC'}</span>
+                </div>
+                {showInstrumentPanel && (
+                  <div className="daw-sidebar__instruments-body">
+                    <InstrumentPicker label={t('sidebar.leadMelody')} selectedProgram={leadProgram} onChange={setLeadProgram} />
+                    <InstrumentPicker label={t('sidebar.bass')} selectedProgram={bassProgram} onChange={setBassProgram} />
+                    <InstrumentPicker label={t('sidebar.harmonyArp')} selectedProgram={harmonyProgram} onChange={setHarmonyProgram} />
+                  </div>
+                )}
+              </div>
+
+              <div className="daw-sidebar__footer">
+                <span className="daw-sidebar__source">
+                  {sourceFileName ? `${t('sidebar.melody')}: ${sourceFileName}` : t('sidebar.melodyInput')}
+                </span>
+                <div className="daw-sidebar__footer-btns">
+                  <button className="btn btn--small btn--demo" onClick={handleLoadDemo}>{t('sidebar.demo')}</button>
+                  <button className="btn btn--small" onClick={() => setCurrentStep(1)}>{t('sidebar.uploadFile')}</button>
+                </div>
+              </div>
+            </div>
+
+            <div className="daw-arrange-area">
+              {!arrangement && notes.length > 0 && (
+                <div className="daw-arrange-area__cta">
+                  <button className="btn btn--primary btn--large" onClick={() => { void handleGenerate(); }} disabled={isGenerating}>
+                    {isGenerating ? t('arrange_generating') : t('arrange_generate')}
+                  </button>
+                </div>
+              )}
+              <ArrangementView arrangement={arrangement} currentBeat={currentBeat} beatsPerBar={beatsPerBar} />
+            </div>
+          </div>
+
+          <div className={`daw-midi-player ${showMidiPlayer ? 'daw-midi-player--open' : 'daw-midi-player--closed'}`}>
+            <div className="daw-midi-player__header" onClick={() => setShowMidiPlayer((prev) => !prev)}>
+              <span>MIDI Player</span>
+              <span className="daw-midi-player__toggle">{showMidiPlayer ? '\u25BC' : '\u25B2'}</span>
+            </div>
+            {showMidiPlayer && <MidiPlayer />}
+          </div>
+
+          <div className={`daw-piano-roll ${showPianoRoll ? 'daw-piano-roll--open' : 'daw-piano-roll--closed'}`}>
+            <div className="daw-piano-roll__header" onClick={() => setShowPianoRoll((prev) => !prev)}>
               <span>{t('pianoRoll.title')}{selectedTrack ? ` — ${selectedTrack}` : ''}</span>
-              <span className="daw-editor-panel__toggle">{showPianoRoll ? '\u25BC' : '\u25B2'}</span>
+              <span className="daw-piano-roll__toggle">{showPianoRoll ? '\u25BC' : '\u25B2'}</span>
             </div>
             {showPianoRoll && (
               <PianoRoll
@@ -538,16 +571,48 @@ function App() {
               />
             )}
           </div>
+        </section>
+      );
+    }
 
-          <div className={`daw-editor-panel ${showMidiPlayer ? 'daw-editor-panel--open' : 'daw-editor-panel--closed'}`}>
-            <div className="daw-editor-panel__header" onClick={() => setShowMidiPlayer((p) => !p)}>
-              <span>MIDI Player</span>
-              <span className="daw-editor-panel__toggle">{showMidiPlayer ? '\u25BC' : '\u25B2'}</span>
-            </div>
-            {showMidiPlayer && <MidiPlayer />}
-          </div>
+    return (
+      <ExportView
+        isReady={Boolean(arrangement)}
+        onExportMidi={handleDownloadMidi}
+        onExportMp3={handleExportMp3}
+        onExportLogic={handleExportLogic}
+      />
+    );
+  };
+
+  return (
+    <div className="app-shell">
+      <header className="app-shell__topbar">
+        <a href="/" className="btn btn--small" style={{ textDecoration: 'none' }}>
+          {t('nav_back_to_site')}
+        </a>
+        <div className="app-shell__topbar-right">
+          {sourceFileName && <span className="app-shell__source">{sourceFileName}</span>}
+          <LanguageSwitcher />
         </div>
-      </div>
+      </header>
+
+      {error && (
+        <div className="error-banner" onClick={() => setError(null)}>
+          <span className="error-banner__message">{error}</span>
+          <button className="error-banner__dismiss">&times;</button>
+        </div>
+      )}
+
+      <StepWizard
+        currentStep={currentStep}
+        onBack={handleWizardBack}
+        onNext={handleWizardNext}
+        canGoBack={canGoBack}
+        canGoNext={canGoNext}
+      >
+        {renderCurrentStep()}
+      </StepWizard>
     </div>
   );
 }

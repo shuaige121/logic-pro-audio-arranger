@@ -19,3 +19,11 @@ midi_packs/
 web/.next/
 web/node_modules/
 web/dist/
+web/.tmp/
+web/node_modules_link
+final_test/*.mid
+final_test/*.mp3
+final_test/balanced/
+final_test/conservative/
+final_test/creative/
+final_test/llm_conservative/

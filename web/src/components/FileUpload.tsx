@@ -80,8 +80,8 @@ export default function FileUpload({
         ) : (
           <>
             <div className="file-upload__title">{isDragOver ? t('upload.dropHere') : t('upload.dragDrop')}</div>
-            <div className="file-upload__subtitle">{t('upload.clickBrowse')}</div>
-            <div className="file-upload__formats">{t('upload.formats')}</div>
+            <div className="file-upload__subtitle">{t('upload_browse')}</div>
+            <div className="file-upload__formats">{t('upload_formats')}</div>
           </>
         )}
 
