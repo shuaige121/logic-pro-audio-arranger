@@ -14,7 +14,7 @@ import time
 import requests
 from pathlib import Path
 
-BRAVE_API_KEY = os.environ.get("BRAVE_API_KEY", "***REMOVED***")
+BRAVE_API_KEY = os.environ.get("BRAVE_API_KEY", "")
 BRAVE_URL = "https://api.search.brave.com/res/v1/web/search"
 
 HEADERS = {
