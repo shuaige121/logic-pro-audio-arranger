@@ -7,10 +7,10 @@ export interface NoteEvent {
 
 export interface MelodyData {
   notes: NoteEvent[];
-  tempoBpm: number;
-  beatsPerBar: number;
-  beatUnit: number;
-  key?: KeyEstimate;
+  readonly tempoBpm: number;
+  readonly beatsPerBar: number;
+  readonly beatUnit: number;
+  readonly key?: KeyEstimate;
 }
 
 export interface KeyEstimate {
@@ -48,7 +48,7 @@ export interface ArrangementTrack {
 
 export interface Arrangement {
   tracks: ArrangementTrack[];
-  tempoBpm: number;
+  readonly tempoBpm: number;
   bars: number;
   style: 'pop' | 'modal' | 'jazz';
   complexity: 'basic' | 'rich';

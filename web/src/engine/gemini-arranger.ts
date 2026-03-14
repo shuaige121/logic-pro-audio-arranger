@@ -10,6 +10,27 @@ import { estimateKey, inferBarCount, generateHarmony, buildArrangement } from '.
 
 type CreativityLevel = 'conservative' | 'balanced' | 'creative';
 
+interface ImmutableProjectParams {
+  readonly tempoBpm: number;
+  readonly beatsPerBar: number;
+  readonly key: KeyEstimate;
+}
+
+function createImmutableProjectParams(
+  tempoBpm: number,
+  beatsPerBar: number,
+  key: KeyEstimate,
+): ImmutableProjectParams {
+  return { tempoBpm, beatsPerBar, key: { ...key } };
+}
+
+function enforceImmutableArrangement(
+  arrangement: Arrangement,
+  params: ImmutableProjectParams,
+): Arrangement {
+  return { ...arrangement, tempoBpm: params.tempoBpm };
+}
+
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
 const GEMINI_MODEL = 'gemini-2.0-flash';
 const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
@@ -108,6 +129,7 @@ Creativity guidance:
 - ${creativityGuidance}
 
 ## Rules
+- DO NOT change tempo, key, or time signature. These are immutable: tempo=${tempoBpm} BPM, key=${key.tonicName} ${key.mode}.
 - All note start times must be >= 0 and < ${totalDuration.toFixed(2)}
 - All note durations must be > 0
 - Velocity range: 40-120
@@ -202,9 +224,10 @@ export async function generateArrangementWithAI(
   beatsPerBar: number,
   creativityLevel: CreativityLevel = 'balanced',
 ): Promise<{ arrangement: Arrangement; aiGenerated: boolean; key: KeyEstimate; harmony: import('../types/music.ts').HarmonyCandidate | null }> {
-  const key = estimateKey(melody);
-  const barCount = Math.max(inferBarCount(melody, tempoBpm, beatsPerBar) || bars, bars);
-  const secondsPerBeat = 60 / tempoBpm;
+  const immutable = createImmutableProjectParams(tempoBpm, beatsPerBar, estimateKey(melody));
+  const key = immutable.key;
+  const barCount = Math.max(inferBarCount(melody, immutable.tempoBpm, immutable.beatsPerBar) || bars, bars);
+  const secondsPerBeat = 60 / immutable.tempoBpm;
   const totalDuration = barCount * beatsPerBar * secondsPerBeat;
 
   // Try Gemini first when key is available.
@@ -233,7 +256,7 @@ export async function generateArrangementWithAI(
         complexity,
       };
 
-      return { arrangement, aiGenerated: true, key, harmony: null };
+      return { arrangement: enforceImmutableArrangement(arrangement, immutable), aiGenerated: true, key: immutable.key, harmony: null };
     } catch (err) {
       console.warn('Gemini arranger failed, falling back to local engine:', err);
     }
@@ -249,6 +272,6 @@ export async function generateArrangementWithAI(
     throw new Error('No harmony candidates found');
   }
 
-  const arrangement = buildArrangement(melody, topCandidate.bars, tempoBpm, barCount, style, complexity);
-  return { arrangement, aiGenerated: false, key, harmony: topCandidate };
+  const arrangement = buildArrangement(melody, topCandidate.bars, immutable.tempoBpm, barCount, style, complexity);
+  return { arrangement: enforceImmutableArrangement(arrangement, immutable), aiGenerated: false, key: immutable.key, harmony: topCandidate };
 }
